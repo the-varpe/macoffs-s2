@@ -12,11 +12,11 @@ const currentBlock = 1;
 // status: "alive" | "eliminated" | "qualified" | "pending"
 
 const groupA = [
-  // add players here
+  {name: "FlaxyB", tier: "diamond", status: "eliminated" },
 ];
 
 const groupB = [
-  { name: "thevarpe", tier: "gold", blockPts: [0, 0], status: "alive" },
+  { name: "thevarpe", tier: "gold", status: "qualified" },
 ];
 
 // ── SEED RESULTS ──
