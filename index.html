@@ -1508,9 +1508,14 @@
       //  RENDER
       // ════════════════════════════════════════════════════
 
-      function totalPts(player) {
-        return player.blockPts[currentBlock - 1] ?? 0;
-      }
+        function totalPts(player) {
+    // Auto-calculates from seedResults for the current block — no manual blockPts entry needed
+          const blockSeeds = seedResults.filter(s => s.block === currentBlock && s.results);
+          return blockSeeds.reduce((sum, seed) => {
+            const result = seed.results.find(r => r.name === player.name);
+            return sum + (result ? result.pts : 0);
+          }, 0);
+        }
 
       function renderGroup(players, tbodyId) {
         const sorted = [...players].sort((a, b) => {
