@@ -131,92 +131,45 @@ footer{padding:18px 40px;border-top:1px solid var(--border);font-family:'JetBrai
 const currentBlock = 2;
 
 const groupA = [
-  { name: "Cubie",       tier: "netherite", status: "alive"      },
-  { name: "Vortexigo",   tier: "netherite", status: "alive"      },
-  { name: "PhantomPB",   tier: "diamond",   status: "alive"      },
-  { name: "StrikeRun",   tier: "diamond",   status: "alive"      },
-  { name: "BlindPig",    tier: "diamond",   status: "alive"      },
-  { name: "NovaSplit",   tier: "emerald",   status: "alive"      },
-  { name: "Aqueii",      tier: "emerald",   status: "alive"      },
-  { name: "Praxis",      tier: "emerald",   status: "alive"      },
-  { name: "ZenithPace",  tier: "emerald",   status: "alive"      },
-  { name: "IceWarden",   tier: "diamond",   status: "alive"      },
-  { name: "LunarBaast",  tier: "emerald",   status: "alive"      },
-  { name: "Runix7",      tier: "emerald",   status: "alive"      },
-  { name: "NetherDash",  tier: "diamond",   status: "alive"      },
-  { name: "OverVoid",    tier: "netherite", status: "alive"      },
-  { name: "FrostBridge", tier: "emerald",   status: "eliminated" },
-  { name: "GravelGod",   tier: "diamond",   status: "eliminated" },
-  { name: "SlabRat",     tier: "emerald",   status: "eliminated" },
-  { name: "Zebrux",      tier: "emerald",   status: "eliminated" },
+  
 ];
 
 const groupB = [
-  { name: "CreeperKing",  tier: "gold",  status: "alive"      },
-  { name: "StoneCraft",   tier: "gold",  status: "alive"      },
-  { name: "BogsRun",      tier: "gold",  status: "alive"      },
-  { name: "WarpSpeed",    tier: "iron",  status: "alive"      },
-  { name: "DirtRunner",   tier: "gold",  status: "alive"      },
-  { name: "NightCrawl",   tier: "iron",  status: "alive"      },
-  { name: "SpawnSet",     tier: "gold",  status: "alive"      },
-  { name: "BedroQuen",    tier: "iron",  status: "alive"      },
-  { name: "PiglinPact",   tier: "gold",  status: "alive"      },
-  { name: "MossRacer",    tier: "iron",  status: "alive"      },
-  { name: "CaveRunner",   tier: "coal",  status: "alive"      },
-  { name: "GlowRoot",     tier: "iron",  status: "alive"      },
-  { name: "LavaLeap",     tier: "coal",  status: "alive"      },
-  { name: "ObsidCraft",   tier: "gold",  status: "alive"      },
-  { name: "QuartzRush",   tier: "iron",  status: "eliminated" },
-  { name: "EndPortl",     tier: "coal",  status: "eliminated" },
-  { name: "NetherBrick",  tier: "coal",  status: "eliminated" },
-  { name: "BlazePowdr",   tier: "coal",  status: "eliminated" },
-  { name: "PearlDrop",    tier: "iron",  status: "eliminated" },
-  { name: "BasaltBoy",    tier: "coal",  status: "eliminated" },
+  { name: "thevarpe",  tier: "gold",  status: "alive" }
 ];
 
 const seedResults = [
-  { group:"a",block:1,seedNum:1,overworld:null,bastion:null,results:[
-    {name:"Cubie",time:"8:14",pts:12},{name:"Vortexigo",time:"8:55",pts:9},
-    {name:"PhantomPB",time:"9:02",pts:7},{name:"StrikeRun",time:"9:44",pts:5},
-    {name:"BlindPig",time:"10:11",pts:4},{name:"NovaSplit",time:"11:22",pts:3},
-    {name:"Aqueii",time:"12:05",pts:2},{name:"Praxis",time:"13:40",pts:1},
-  ]},
-  { group:"a",block:1,seedNum:2,overworld:null,bastion:null,results:[
-    {name:"Vortexigo",time:"8:33",pts:12},{name:"Cubie",time:"8:50",pts:9},
-    {name:"OverVoid",time:"9:11",pts:7},{name:"StrikeRun",time:"9:55",pts:5},
-    {name:"PhantomPB",time:"10:22",pts:4},{name:"IceWarden",time:"11:30",pts:3},
-    {name:"ZenithPace",time:"12:00",pts:2},{name:"LunarBaast",time:"13:10",pts:1},
-  ]},
-  { group:"a",block:1,seedNum:3,overworld:null,bastion:null,results:[
-    {name:"PhantomPB",time:"8:59",pts:12},{name:"Cubie",time:"9:05",pts:9},
-    {name:"BlindPig",time:"9:44",pts:7},{name:"NovaSplit",time:"10:55",pts:5},
-    {name:"Aqueii",time:"11:44",pts:4},{name:"Praxis",time:"12:22",pts:3},
-    {name:"NetherDash",time:"13:00",pts:2},{name:"Runix7",time:"14:55",pts:1},
-  ]},
-  { group:"b",block:1,seedNum:1,overworld:null,bastion:null,results:[
-    {name:"CreeperKing",time:"10:05",pts:12},{name:"StoneCraft",time:"11:22",pts:9},
-    {name:"BogsRun",time:"12:00",pts:7},{name:"WarpSpeed",time:"12:44",pts:5},
-    {name:"DirtRunner",time:"13:10",pts:4},{name:"NightCrawl",time:"14:05",pts:3},
-    {name:"SpawnSet",time:"15:22",pts:2},{name:"BedroQuen",time:"16:00",pts:1},
-  ]},
-  { group:"b",block:1,seedNum:2,overworld:null,bastion:null,results:[
-    {name:"StoneCraft",time:"11:05",pts:12},{name:"CreeperKing",time:"11:40",pts:9},
-    {name:"WarpSpeed",time:"12:22",pts:7},{name:"PiglinPact",time:"13:00",pts:5},
-    {name:"BogsRun",time:"13:44",pts:4},{name:"MossRacer",time:"14:30",pts:3},
-    {name:"CaveRunner",time:"15:11",pts:2},{name:"GlowRoot",time:"16:40",pts:1},
-  ]},
-  { group:"b",block:1,seedNum:3,overworld:null,bastion:null,results:[
-    {name:"BogsRun",time:"11:22",pts:12},{name:"DirtRunner",time:"12:00",pts:9},
-    {name:"CreeperKing",time:"12:30",pts:7},{name:"NightCrawl",time:"13:44",pts:5},
-    {name:"SpawnSet",time:"14:55",pts:4},{name:"ObsidCraft",time:"15:22",pts:3},
-    {name:"LavaLeap",time:"16:00",pts:2},{name:"BedroQuen",time:"17:10",pts:1},
-  ]},
+  { group:"a",block:1,seedNum:1,overworld:null,bastion:null,results:null},
+  { group:"a",block:1,seedNum:2,overworld:null,bastion:null,results:null},
+  { group:"a",block:1,seedNum:3,overworld:null,bastion:null,results:null},
+  
+  { group:"b",block:1,seedNum:1,overworld:null,bastion:null,results:[name: "thevarpe:, time: "10:00", pts:12]},
+  { group:"b",block:1,seedNum:2,overworld:null,bastion:null,results:null},
+  { group:"b",block:1,seedNum:3,overworld:null,bastion:null,results:null},
+  
   { group:"a",block:2,seedNum:4,overworld:null,bastion:null,results:null },
   { group:"a",block:2,seedNum:5,overworld:null,bastion:null,results:null },
   { group:"a",block:2,seedNum:6,overworld:null,bastion:null,results:null },
+  
   { group:"b",block:2,seedNum:4,overworld:null,bastion:null,results:null },
   { group:"b",block:2,seedNum:5,overworld:null,bastion:null,results:null },
   { group:"b",block:2,seedNum:6,overworld:null,bastion:null,results:null },
+
+  { group:"a",block:3,seedNum:7,overworld:null,bastion:null,results:null},
+  { group:"a",block:3,seedNum:8,overworld:null,bastion:null,results:null},
+  { group:"a",block:3,seedNum:9,overworld:null,bastion:null,results:null},
+  
+  { group:"b",block:3,seedNum:7,overworld:null,bastion:null,results:null},
+  { group:"b",block:3,seedNum:8,overworld:null,bastion:null,results:null},
+  { group:"b",block:3,seedNum:9,overworld:null,bastion:null,results:null},
+  
+  { group:"a",block:4,seedNum:10,overworld:null,bastion:null,results:null },
+  { group:"a",block:4,seedNum:11,overworld:null,bastion:null,results:null },
+  { group:"a",block:4,seedNum:12,overworld:null,bastion:null,results:null },
+  
+  { group:"b",block:4,seedNum:10,overworld:null,bastion:null,results:null },
+  { group:"b",block:4,seedNum:11,overworld:null,bastion:null,results:null },
+  { group:"b",block:4,seedNum:12,overworld:null,bastion:null,results:null },
 ];
 
 // ════════════════════════════════════════════
