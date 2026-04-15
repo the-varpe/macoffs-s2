@@ -12,7 +12,7 @@ const currentBlock = 1;
 // status: "alive" | "eliminated" | "qualified" | "pending"
 
 const groupA = [
-  {name: "FlaxyB", tier: "diamond", status: "eliminated" },
+  { name: "FlaxyB", tier: "diamond", status: "eliminated" },
 ];
 
 const groupB = [
