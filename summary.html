@@ -122,7 +122,6 @@ footer{padding:18px 40px;border-top:1px solid var(--border);font-family:'JetBrai
 </main>
 <footer>
   <span>MacOffs Season 2 · Commentary View</span>
-  <span id="footer-info"></span>
 </footer>
 </div>
 <script src="data.js"></script>
@@ -264,13 +263,7 @@ function render() {
     </div>`;
   }).join('');
 
-  const activeCount = isFinals ? players.length : players.filter(p => p.status!=='eliminated').length;
-  const elimCount   = isFinals ? 0 : players.filter(p => p.status==='eliminated').length;
-  const groupLabel  = isFinals ? 'Finals' : g==='a' ? 'Group A' : 'Group B';
-  document.getElementById('footer-info').textContent =
-    isFinals
-      ? `Finals · ${activeCount} players`
-      : `${groupLabel} · ${activeCount} active · ${elimCount} eliminated`;
+  
 }
 
 setGroup('a');
