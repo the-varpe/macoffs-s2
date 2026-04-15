@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MacOffs S2 — Commentary View</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080a0d;--bg2:#0e1117;--surface:#13161e;--surface2:#1c2030;
+  --border:#252a38;--border2:#303650;--text:#dde3f0;--muted:#5a6380;
+  --coal:#9e8060;--iron:#b0bec8;--gold:#f0c040;--emerald:#40d878;
+  --diamond:#38d4f8;--netherite:#c87af0;--eliminated:#ff3a3a;
+  --alive:#38d4f8;--qualified:#40d878;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Oxanium',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(56,212,248,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(56,212,248,0.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+.wrap{position:relative;z-index:1;}
+header{padding:26px 40px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.header-left{display:flex;flex-direction:column;gap:4px;}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--emerald);}
+.header-title{font-size:26px;font-weight:800;letter-spacing:-0.5px;line-height:1;}
+.header-title em{font-style:normal;background:linear-gradient(135deg,var(--diamond),var(--netherite));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.full-tracker-btn{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border:1px solid var(--diamond);color:var(--diamond);background:rgba(56,212,248,0.06);text-decoration:none;transition:all 0.2s;}
+.full-tracker-btn:hover{background:rgba(56,212,248,0.14);}
+.group-toggle{display:flex;border:1px solid var(--border);overflow:hidden;}
+.toggle-btn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:9px 22px;background:none;border:none;border-right:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.toggle-btn:last-child{border-right:none;}
+.toggle-btn:hover{color:var(--text);background:var(--surface2);}
+.toggle-btn.active-a{background:rgba(200,122,240,0.12);color:var(--netherite);border-bottom:2px solid var(--netherite);}
+.toggle-btn.active-b{background:rgba(240,192,64,0.1);color:var(--gold);border-bottom:2px solid var(--gold);}
+main{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:32px 40px;max-width:1400px;}
+@media(max-width:860px){main{grid-template-columns:1fr;}}
+.panel{background:var(--surface);border:1px solid var(--border);overflow:hidden;border-top:2px solid var(--netherite);transition:border-top-color 0.3s;}
+.panel-header{padding:15px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.panel-title{font-size:13px;font-weight:700;letter-spacing:0.5px;transition:color 0.3s;}
+.panel-sub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:3px;}
+.panel-badge{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 10px;text-transform:uppercase;border-radius:2px;border:1px solid rgba(200,122,240,0.35);background:rgba(200,122,240,0.07);color:var(--netherite);transition:all 0.3s;}
+.lb-table{width:100%;border-collapse:collapse;}
+.lb-table tbody tr{border-bottom:1px solid rgba(37,42,56,0.5);transition:background 0.15s;animation:fadeUp 0.3s ease both;}
+.lb-table tbody tr:hover{background:rgba(56,212,248,0.03);}
+.lb-table tbody tr:last-child{border-bottom:none;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+.lb-table td{padding:11px 22px;font-size:13px;}
+.lb-rank{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);width:28px;}
+.lb-rank.r1{color:var(--gold);font-weight:800;font-size:15px;}
+.lb-rank.r2{color:var(--iron);font-weight:700;font-size:13px;}
+.lb-rank.r3{color:var(--coal);font-weight:700;font-size:13px;}
+.lb-name{font-weight:600;font-size:14px;}
+.tier-pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 6px;text-transform:uppercase;margin-left:8px;border-radius:2px;}
+.t-coal{background:rgba(158,128,96,0.12);color:var(--coal);border:1px solid rgba(158,128,96,0.3);}
+.t-iron{background:rgba(176,190,200,0.12);color:var(--iron);border:1px solid rgba(176,190,200,0.3);}
+.t-gold{background:rgba(240,192,64,0.1);color:var(--gold);border:1px solid rgba(240,192,64,0.3);}
+.t-emerald{background:rgba(64,216,120,0.1);color:var(--emerald);border:1px solid rgba(64,216,120,0.3);}
+.t-diamond{background:rgba(56,212,248,0.1);color:var(--diamond);border:1px solid rgba(56,212,248,0.3);}
+.t-netherite{background:rgba(200,122,240,0.1);color:var(--netherite);border:1px solid rgba(200,122,240,0.3);}
+.lb-pts{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--diamond);text-align:right;}
+.lb-pts.leader{color:var(--emerald);}
+.lb-status{text-align:right;width:72px;}
+.status-tag{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;padding:2px 8px;text-transform:uppercase;border-radius:2px;}
+.s-alive{color:var(--alive);border:1px solid rgba(56,212,248,0.3);background:rgba(56,212,248,0.05);}
+.s-qualified{color:var(--qualified);border:1px solid rgba(64,216,120,0.3);background:rgba(64,216,120,0.05);}
+.s-eliminated{color:var(--eliminated);border:1px solid rgba(255,58,58,0.3);background:rgba(255,58,58,0.05);}
+tr.is-elim td{opacity:0.35;}
+tr.is-elim .lb-name{text-decoration:line-through;}
+.seed-row{display:flex;align-items:center;gap:12px;padding:10px 22px;border-bottom:1px solid rgba(37,42,56,0.4);font-size:13px;transition:background 0.15s;animation:fadeUp 0.3s ease both;}
+.seed-row:last-child{border-bottom:none;}
+.seed-row:hover{background:rgba(56,212,248,0.03);}
+.seed-pos{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);width:32px;flex-shrink:0;}
+.seed-pos.p1{color:var(--gold);font-weight:800;font-size:14px;}
+.seed-pos.p2{color:var(--iron);font-weight:600;}
+.seed-pos.p3{color:var(--coal);font-weight:600;}
+.seed-name{flex:1;font-weight:600;}
+.seed-time{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.seed-time.fast{color:var(--emerald);}
+.seed-pts{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--diamond);width:36px;text-align:right;}
+.no-data{padding:32px 22px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;text-align:center;}
+footer{padding:18px 40px;border-top:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;display:flex;justify-content:space-between;align-items:center;}
+::-webkit-scrollbar{width:3px;height:3px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border2);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="header-left">
+    <span class="eyebrow">MacOffs · Commentary View</span>
+    <div class="header-title">MacOffs <em>S2</em></div>
+  </div>
+  <div class="header-right">
+    <div class="group-toggle">
+      <button class="toggle-btn" id="btn-a" onclick="setGroup('a')">Group A</button>
+      <button class="toggle-btn" id="btn-b" onclick="setGroup('b')">Group B</button>
+    </div>
+    <a class="full-tracker-btn" href="index.html" target="_blank">↗ Full Tracker</a>
+  </div>
+</header>
+<main>
+  <div class="panel" id="lb-panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title" id="lb-title">Block Standings</div>
+        <div class="panel-sub" id="lb-sub"></div>
+      </div>
+      <span class="panel-badge" id="lb-badge"></span>
+    </div>
+    <table class="lb-table"><tbody id="lb-body"></tbody></table>
+  </div>
+  <div class="panel" id="seed-panel">
+    <div class="panel-header">
+      <div>
+        <div class="panel-title" id="seed-title">Last Seed</div>
+        <div class="panel-sub" id="seed-sub"></div>
+      </div>
+      <span class="panel-badge" id="seed-badge"></span>
+    </div>
+    <div id="seed-body"></div>
+  </div>
+</main>
+<footer>
+  <span>MacOffs Season 2 · Commentary View</span>
+  <span id="footer-info"></span>
+</footer>
+</div>
+<script>
+// ════════════════════════════════════════════
+// DATA — keep in sync with index.html
+// ════════════════════════════════════════════
+
+const currentBlock = 2;
+
+const groupA = [
+  { name: "Cubie",       tier: "netherite", status: "alive"      },
+  { name: "Vortexigo",   tier: "netherite", status: "alive"      },
+  { name: "PhantomPB",   tier: "diamond",   status: "alive"      },
+  { name: "StrikeRun",   tier: "diamond",   status: "alive"      },
+  { name: "BlindPig",    tier: "diamond",   status: "alive"      },
+  { name: "NovaSplit",   tier: "emerald",   status: "alive"      },
+  { name: "Aqueii",      tier: "emerald",   status: "alive"      },
+  { name: "Praxis",      tier: "emerald",   status: "alive"      },
+  { name: "ZenithPace",  tier: "emerald",   status: "alive"      },
+  { name: "IceWarden",   tier: "diamond",   status: "alive"      },
+  { name: "LunarBaast",  tier: "emerald",   status: "alive"      },
+  { name: "Runix7",      tier: "emerald",   status: "alive"      },
+  { name: "NetherDash",  tier: "diamond",   status: "alive"      },
+  { name: "OverVoid",    tier: "netherite", status: "alive"      },
+  { name: "FrostBridge", tier: "emerald",   status: "eliminated" },
+  { name: "GravelGod",   tier: "diamond",   status: "eliminated" },
+  { name: "SlabRat",     tier: "emerald",   status: "eliminated" },
+  { name: "Zebrux",      tier: "emerald",   status: "eliminated" },
+];
+
+const groupB = [
+  { name: "CreeperKing",  tier: "gold",  status: "alive"      },
+  { name: "StoneCraft",   tier: "gold",  status: "alive"      },
+  { name: "BogsRun",      tier: "gold",  status: "alive"      },
+  { name: "WarpSpeed",    tier: "iron",  status: "alive"      },
+  { name: "DirtRunner",   tier: "gold",  status: "alive"      },
+  { name: "NightCrawl",   tier: "iron",  status: "alive"      },
+  { name: "SpawnSet",     tier: "gold",  status: "alive"      },
+  { name: "BedroQuen",    tier: "iron",  status: "alive"      },
+  { name: "PiglinPact",   tier: "gold",  status: "alive"      },
+  { name: "MossRacer",    tier: "iron",  status: "alive"      },
+  { name: "CaveRunner",   tier: "coal",  status: "alive"      },
+  { name: "GlowRoot",     tier: "iron",  status: "alive"      },
+  { name: "LavaLeap",     tier: "coal",  status: "alive"      },
+  { name: "ObsidCraft",   tier: "gold",  status: "alive"      },
+  { name: "QuartzRush",   tier: "iron",  status: "eliminated" },
+  { name: "EndPortl",     tier: "coal",  status: "eliminated" },
+  { name: "NetherBrick",  tier: "coal",  status: "eliminated" },
+  { name: "BlazePowdr",   tier: "coal",  status: "eliminated" },
+  { name: "PearlDrop",    tier: "iron",  status: "eliminated" },
+  { name: "BasaltBoy",    tier: "coal",  status: "eliminated" },
+];
+
+const seedResults = [
+  { group:"a",block:1,seedNum:1,overworld:null,bastion:null,results:[
+    {name:"Cubie",time:"8:14",pts:12},{name:"Vortexigo",time:"8:55",pts:9},
+    {name:"PhantomPB",time:"9:02",pts:7},{name:"StrikeRun",time:"9:44",pts:5},
+    {name:"BlindPig",time:"10:11",pts:4},{name:"NovaSplit",time:"11:22",pts:3},
+    {name:"Aqueii",time:"12:05",pts:2},{name:"Praxis",time:"13:40",pts:1},
+  ]},
+  { group:"a",block:1,seedNum:2,overworld:null,bastion:null,results:[
+    {name:"Vortexigo",time:"8:33",pts:12},{name:"Cubie",time:"8:50",pts:9},
+    {name:"OverVoid",time:"9:11",pts:7},{name:"StrikeRun",time:"9:55",pts:5},
+    {name:"PhantomPB",time:"10:22",pts:4},{name:"IceWarden",time:"11:30",pts:3},
+    {name:"ZenithPace",time:"12:00",pts:2},{name:"LunarBaast",time:"13:10",pts:1},
+  ]},
+  { group:"a",block:1,seedNum:3,overworld:null,bastion:null,results:[
+    {name:"PhantomPB",time:"8:59",pts:12},{name:"Cubie",time:"9:05",pts:9},
+    {name:"BlindPig",time:"9:44",pts:7},{name:"NovaSplit",time:"10:55",pts:5},
+    {name:"Aqueii",time:"11:44",pts:4},{name:"Praxis",time:"12:22",pts:3},
+    {name:"NetherDash",time:"13:00",pts:2},{name:"Runix7",time:"14:55",pts:1},
+  ]},
+  { group:"b",block:1,seedNum:1,overworld:null,bastion:null,results:[
+    {name:"CreeperKing",time:"10:05",pts:12},{name:"StoneCraft",time:"11:22",pts:9},
+    {name:"BogsRun",time:"12:00",pts:7},{name:"WarpSpeed",time:"12:44",pts:5},
+    {name:"DirtRunner",time:"13:10",pts:4},{name:"NightCrawl",time:"14:05",pts:3},
+    {name:"SpawnSet",time:"15:22",pts:2},{name:"BedroQuen",time:"16:00",pts:1},
+  ]},
+  { group:"b",block:1,seedNum:2,overworld:null,bastion:null,results:[
+    {name:"StoneCraft",time:"11:05",pts:12},{name:"CreeperKing",time:"11:40",pts:9},
+    {name:"WarpSpeed",time:"12:22",pts:7},{name:"PiglinPact",time:"13:00",pts:5},
+    {name:"BogsRun",time:"13:44",pts:4},{name:"MossRacer",time:"14:30",pts:3},
+    {name:"CaveRunner",time:"15:11",pts:2},{name:"GlowRoot",time:"16:40",pts:1},
+  ]},
+  { group:"b",block:1,seedNum:3,overworld:null,bastion:null,results:[
+    {name:"BogsRun",time:"11:22",pts:12},{name:"DirtRunner",time:"12:00",pts:9},
+    {name:"CreeperKing",time:"12:30",pts:7},{name:"NightCrawl",time:"13:44",pts:5},
+    {name:"SpawnSet",time:"14:55",pts:4},{name:"ObsidCraft",time:"15:22",pts:3},
+    {name:"LavaLeap",time:"16:00",pts:2},{name:"BedroQuen",time:"17:10",pts:1},
+  ]},
+  { group:"a",block:2,seedNum:4,overworld:null,bastion:null,results:null },
+  { group:"a",block:2,seedNum:5,overworld:null,bastion:null,results:null },
+  { group:"a",block:2,seedNum:6,overworld:null,bastion:null,results:null },
+  { group:"b",block:2,seedNum:4,overworld:null,bastion:null,results:null },
+  { group:"b",block:2,seedNum:5,overworld:null,bastion:null,results:null },
+  { group:"b",block:2,seedNum:6,overworld:null,bastion:null,results:null },
+];
+
+// ════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════
+
+let currentGroup = 'a';
+
+function parseTime(t) {
+  if (!t || t === '—') return 9999;
+  const [m,s] = t.split(':').map(Number);
+  return m*60+(s||0);
+}
+
+function blockPts(player) {
+  const seeds = seedResults.filter(s => s.block===currentBlock && s.group===currentGroup && s.results);
+  return seeds.reduce((sum,seed) => {
+    const r = seed.results.find(r => r.name===player.name);
+    return sum + (r ? r.pts : 0);
+  }, 0);
+}
+
+function setGroup(g) {
+  currentGroup = g;
+  const isA = g === 'a';
+
+  document.getElementById('btn-a').className = 'toggle-btn' + (isA ? ' active-a' : '');
+  document.getElementById('btn-b').className = 'toggle-btn' + (!isA ? ' active-b' : '');
+
+  const accentHex = isA ? '#c87af0' : '#f0c040';
+  const badgeBorder = isA ? 'rgba(200,122,240,0.35)' : 'rgba(240,192,64,0.35)';
+  const badgeBg     = isA ? 'rgba(200,122,240,0.07)' : 'rgba(240,192,64,0.07)';
+
+  ['lb-panel','seed-panel'].forEach(id => {
+    document.getElementById(id).style.borderTopColor = accentHex;
+  });
+  ['lb-title','seed-title','lb-badge','seed-badge'].forEach(id => {
+    document.getElementById(id).style.color = accentHex;
+  });
+  ['lb-badge','seed-badge'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.borderColor = badgeBorder;
+    el.style.background  = badgeBg;
+  });
+
+  render();
+}
+
+function render() {
+  const g = currentGroup;
+  const players = g === 'a' ? groupA : groupB;
+  const grpLabel = g === 'a' ? 'Group A · Netherite · Diamond · Emerald' : 'Group B · Gold · Iron · Coal';
+  const completedCount = seedResults.filter(s => s.group===g && s.block===currentBlock && s.results).length;
+
+  // ── LEADERBOARD ──
+  const active = players.filter(p => p.status !== 'eliminated');
+  const elim   = players.filter(p => p.status === 'eliminated');
+  const sorted = [...active].sort((a,b) => blockPts(b) - blockPts(a));
+  const all    = [...sorted, ...elim];
+
+  document.getElementById('lb-title').textContent = 'Block Standings';
+  document.getElementById('lb-sub').textContent   = grpLabel;
+  document.getElementById('lb-badge').textContent = `Block ${currentBlock} · ${completedCount}/3 seeds`;
+
+  const tbody = document.getElementById('lb-body');
+  tbody.innerHTML = '';
+  all.forEach((p,i) => {
+    const pts    = blockPts(p);
+    const isElim = p.status === 'eliminated';
+    const rank   = isElim ? '—' : i+1;
+    const rCls   = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+    const pCls   = !isElim && i===0 ? 'leader' : '';
+    const sCls   = isElim?'s-eliminated':p.status==='qualified'?'s-qualified':'s-alive';
+    const sLbl   = isElim?'OUT':p.status==='qualified'?'FINALS':'ALIVE';
+    const tr     = document.createElement('tr');
+    if (isElim) tr.className = 'is-elim';
+    tr.style.animationDelay = `${i*28}ms`;
+    tr.innerHTML = `
+      <td class="lb-rank ${rCls}">${rank}</td>
+      <td class="lb-name">${p.name}<span class="tier-pill t-${p.tier}">${p.tier}</span></td>
+      <td class="lb-pts ${pCls}">${pts}</td>
+      <td class="lb-status"><span class="status-tag ${sCls}">${sLbl}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // ── LAST SEED ──
+  const completed = seedResults
+    .filter(s => s.group===g && s.results)
+    .sort((a,b) => b.block!==a.block ? b.block-a.block : b.seedNum-a.seedNum);
+
+  const seedBody  = document.getElementById('seed-body');
+  const seedTitle = document.getElementById('seed-title');
+  const seedSub   = document.getElementById('seed-sub');
+  const seedBadge = document.getElementById('seed-badge');
+
+  if (!completed.length) {
+    seedTitle.textContent = 'Last Seed';
+    seedSub.textContent   = '';
+    seedBadge.textContent = 'No seeds yet';
+    seedBody.innerHTML    = '<div class="no-data">No seeds completed yet</div>';
+    return;
+  }
+
+  const last  = completed[0];
+  const owLbl = last.overworld ? ` · ${last.overworld}` : '';
+  const baLbl = last.bastion   ? ` · ${last.bastion}`   : '';
+
+  seedTitle.textContent = `Seed ${last.seedNum} Results`;
+  seedSub.textContent   = `Block ${last.block}${owLbl}${baLbl}`;
+  seedBadge.textContent = `Block ${last.block} · Seed ${last.seedNum}`;
+
+  seedBody.innerHTML = last.results.map((r,ri) => {
+    const pc = ri===0?'p1':ri===1?'p2':ri===2?'p3':'';
+    const pl = ri===0?'1st':ri===1?'2nd':ri===2?'3rd':`${ri+1}th`;
+    const fc = parseTime(r.time)<600?'fast':'';
+    return `<div class="seed-row" style="animation-delay:${ri*25}ms">
+      <span class="seed-pos ${pc}">${pl}</span>
+      <span class="seed-name">${r.name}</span>
+      <span class="seed-time ${fc}">${r.time}</span>
+      <span class="seed-pts">+${r.pts}</span>
+    </div>`;
+  }).join('');
+
+  const activeCount = players.filter(p => p.status!=='eliminated').length;
+  const elimCount   = players.filter(p => p.status==='eliminated').length;
+  document.getElementById('footer-info').textContent =
+    `${g==='a'?'Group A':'Group B'} · ${activeCount} active · ${elimCount} eliminated`;
+}
+
+setGroup('a');
+</script>
+</body>
+</html>
