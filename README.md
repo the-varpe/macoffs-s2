@@ -11,3 +11,9 @@ Further the "Seeds" page allows for easy tracking of the points achieved by a pl
 <img width="800" height="450" alt="image" src="https://github.com/user-attachments/assets/989a9076-01ca-4509-a218-832251a31907" />
 
 Finally there is a page that displays the scoring and elimination information alongside other information about how the event is setup.
+
+
+
+There is also a separate summary view that can be used during the commentary to present the leaderboard and the scoreboard from the last seed that was played, with separate tabs for Group A, Group B, and the Finals Group
+<img width="800" height="450" alt="image" src="https://github.com/user-attachments/assets/e37d594c-9c96-40b7-9a8f-0bf4e721cdef" />
+
