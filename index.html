@@ -904,7 +904,7 @@ footer {
 
 // status: "alive" | "eliminated" | "qualified" | "pending"
 const groupA = [
-  { name: "Cubie",       tier: "netherite", blockPts: [28, 0], status: "alive"      },
+  { name: "Cubie",       tier: "netherite", blockPts: [28, 15], status: "qualified"      },
   { name: "Vortexigo",   tier: "netherite", blockPts: [24, 0], status: "alive"      },
   { name: "PhantomPB",   tier: "diamond",   blockPts: [21, 0], status: "alive"      },
   { name: "StrikeRun",   tier: "diamond",   blockPts: [19, 0], status: "alive"      },
@@ -951,11 +951,12 @@ const groupB = [
 const currentBlock = 2;
 
 // Seed results — null result = pending
-// Each seed: { group, block, seedNum, results: [{name, time, pts}] | null }
+// Each seed: { group, block, seedNum, overworld, bastion results: [{name, time, pts}] | null }
 const seedResults = [
   // GROUP A — BLOCK 1
+// CHANGE ONCE EACH SEED IS COMPLETE, add new thing innit
   {
-    group: "a", block: 1, seedNum: 1,
+    group: "a", block: 1, seedNum: 1, overworld: null, bastion: null,
     results: [
       { name: "Cubie",      time: "8:14", pts: 12 },
       { name: "Vortexigo",  time: "8:55", pts: 9  },
@@ -968,7 +969,7 @@ const seedResults = [
     ]
   },
   {
-    group: "a", block: 1, seedNum: 2,
+    group: "a", block: 1, seedNum: 2, overworld: "village", bastion: null,
     results: [
       { name: "Vortexigo",  time: "8:33", pts: 12 },
       { name: "Cubie",      time: "8:50", pts: 9  },
@@ -981,7 +982,7 @@ const seedResults = [
     ]
   },
   {
-    group: "a", block: 1, seedNum: 3,
+    group: "a", block: 1, seedNum: 3, overworld: null, bastion: "treasure",
     results: [
       { name: "PhantomPB",  time: "8:59", pts: 12 },
       { name: "Cubie",      time: "9:05", pts: 9  },
@@ -995,7 +996,7 @@ const seedResults = [
   },
   // GROUP B — BLOCK 1
   {
-    group: "b", block: 1, seedNum: 1,
+    group: "b", block: 1, seedNum: 1, overworld: null, bastion: null,
     results: [
       { name: "CreeperKing", time: "10:05",pts: 12 },
       { name: "StoneCraft",  time: "11:22",pts: 9  },
@@ -1008,7 +1009,7 @@ const seedResults = [
     ]
   },
   {
-    group: "b", block: 1, seedNum: 2,
+    group: "b", block: 1, seedNum: 2, overworld: null, bastion: null,
     results: [
       { name: "StoneCraft",  time: "11:05",pts: 12 },
       { name: "CreeperKing", time: "11:40",pts: 9  },
@@ -1021,7 +1022,7 @@ const seedResults = [
     ]
   },
   {
-    group: "b", block: 1, seedNum: 3,
+    group: "b", block: 1, seedNum: 3, overworld: null, bastion: null,
     results: [
       { name: "BogsRun",     time: "11:22",pts: 12 },
       { name: "DirtRunner",  time: "12:00",pts: 9  },
@@ -1034,13 +1035,13 @@ const seedResults = [
     ]
   },
   // GROUP A — BLOCK 2 (in progress)
-  { group: "a", block: 2, seedNum: 4, results: null },
-  { group: "a", block: 2, seedNum: 5, results: null },
-  { group: "a", block: 2, seedNum: 6, results: null },
+  { group: "a", block: 2, seedNum: 4, overworld: null, bastion: null, results: null },
+  { group: "a", block: 2, seedNum: 5, overworld: null, bastion: null, results: null },
+  { group: "a", block: 2, seedNum: 6, overworld: null, bastion: null, results: null },
   // GROUP B — BLOCK 2 (pending)
-  { group: "b", block: 2, seedNum: 4, results: null },
-  { group: "b", block: 2, seedNum: 5, results: null },
-  { group: "b", block: 2, seedNum: 6, results: null },
+  { group: "b", block: 2, seedNum: 4, overworld: null, bastion: null, results: null },
+  { group: "b", block: 2, seedNum: 5, overworld: null, bastion: null, results: null },
+  { group: "b", block: 2, seedNum: 6, overworld: null, bastion: null, results: null },
 ];
 
 // ════════════════════════════════════════════════════
@@ -1085,19 +1086,19 @@ function renderGroup(players, tbodyId) {
   });
 }
 
-function renderSeeds(group, block, gridId) {
-  const seeds = seedResults.filter(s => s.group === group && s.block === block);
+function renderSeeds(overworld, bastion, gridId) {
+  const seeds = seedResults.filter(s => s.overworld === overworld && s.bastion === bastion);
   const grid = document.getElementById(gridId);
   if (!grid) return;
   grid.innerHTML = '';
 
   seeds.forEach((s, si) => {
     const card = document.createElement('div');
-    const grpClass = s.results ? `grp-${s.group}` : 'grp-pending';
+    const grpClass = s.results ? `grp-${s.overworld}` : 'grp-pending';
     card.className = `seed-card ${grpClass}`;
     card.style.animationDelay = `${si * 50}ms`;
 
-    const label = `Seed ${s.seedNum} · Group ${s.group.toUpperCase()} · Block ${s.block}`;
+    const label = `Seed ${s.seedNum} · Overworld ${s.overworld.toUpperCase()} · Bastion ${s.bastion.toUpperCase()}`;
 
     if (!s.results) {
       card.innerHTML = `
