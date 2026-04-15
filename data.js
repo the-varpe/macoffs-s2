@@ -28,14 +28,14 @@ const groupB = [
 
 const seedResults = [
   // GROUP A — BLOCK 1
-  { group: "a", block: 1, seedNum: 1, overworld: null, bastion: null, results: [] },
-  { group: "a", block: 1, seedNum: 2, overworld: null, bastion: null, results: [] },
-  { group: "a", block: 1, seedNum: 3, overworld: null, bastion: null, results: [] },
+  { group: "a", block: 1, seedNum: 1, overworld: null, bastion: null, results: null },
+  { group: "a", block: 1, seedNum: 2, overworld: null, bastion: null, results: null },
+  { group: "a", block: 1, seedNum: 3, overworld: null, bastion: null, results: null },
 
   // GROUP B — BLOCK 1
   { group: "b", block: 1, seedNum: 1, overworld: null, bastion: null, results: [{ name: "thevarpe", time: "10:05", pts: 12 }] },
   { group: "b", block: 1, seedNum: 2, overworld: null, bastion: null, results: [{ name: "thevarpe", time: "10:05", pts: 12 }] },
-  { group: "b", block: 1, seedNum: 3, overworld: null, bastion: null, results: [] },
+  { group: "b", block: 1, seedNum: 3, overworld: null, bastion: null, results: null },
 
   // GROUP A — BLOCK 2
   { group: "a", block: 2, seedNum: 4,  overworld: null, bastion: null, results: null },
