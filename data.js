@@ -6,7 +6,7 @@
 
 // ── CURRENT BLOCK: 1, 2, 3, 4, or 5 (5 = Finals) ──
 // CHANGE ACCORDING TO CURRENT BLOCK ----------------------------------------------------------------
-const currentBlock = 1;
+const currentBlock = 5;
 
 // ── PLAYERS ──
 // status: "alive" | "eliminated" | "qualified" | "pending"
