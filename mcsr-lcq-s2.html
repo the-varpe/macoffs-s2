@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MacOffs — Season 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;600;700;800&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #080a0d;
+  --bg2:       #0e1117;
+  --surface:   #13161e;
+  --surface2:  #1c2030;
+  --border:    #252a38;
+  --border2:   #303650;
+  --text:      #dde3f0;
+  --muted:     #5a6380;
+  --faint:     #2a3050;
+
+  --coal:      #9e8060;
+  --iron:      #b0bec8;
+  --gold:      #f0c040;
+  --emerald:   #40d878;
+  --diamond:   #38d4f8;
+  --netherite: #c87af0;
+
+  --eliminated: #ff3a3a;
+  --qualified:  #40d878;
+  --pending:    #f0c040;
+  --alive:      #38d4f8;
+
+  --glow-a: rgba(200,122,240,0.15);
+  --glow-b: rgba(64,216,120,0.15);
+  --glow-f: rgba(240,192,64,0.2);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Oxanium', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BACKGROUND EFFECTS ── */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-orb-1 { width: 600px; height: 600px; top: -200px; right: -100px; background: var(--glow-a); }
+.bg-orb-2 { width: 500px; height: 500px; bottom: -150px; left: -100px; background: var(--glow-b); }
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(56,212,248,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,212,248,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap { position: relative; z-index: 1; }
+
+/* ── HEADER ── */
+header {
+  padding: 52px 48px 36px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.title-block { display: flex; flex-direction: column; gap: 6px; }
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--emerald);
+}
+
+h1 {
+  font-size: clamp(44px, 7vw, 88px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 0.9;
+  color: var(--text);
+}
+
+h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--diamond), var(--netherite));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.phase-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border: 1px solid var(--emerald);
+  color: var(--emerald);
+  background: rgba(64,216,120,0.06);
+}
+
+.header-stats {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+  line-height: 1.9;
+}
+
+.dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--emerald);
+  margin-right: 6px;
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  padding: 0 48px;
+  border-bottom: 1px solid var(--border);
+  gap: 0;
+  overflow-x: auto;
+}
+
+.tab {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 16px 24px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--diamond); border-bottom-color: var(--diamond); }
+
+/* ── MAIN ── */
+main { padding: 40px 48px; max-width: 1440px; }
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── STAT STRIP ── */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+
+.stat-item {
+  background: var(--surface);
+  padding: 22px 24px;
+}
+
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.stat-val {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+}
+.stat-val.c-diamond   { color: var(--diamond); }
+.stat-val.c-emerald   { color: var(--emerald); }
+.stat-val.c-netherite { color: var(--netherite); }
+.stat-val.c-gold      { color: var(--gold); }
+
+/* ── GROUP PANELS ── */
+.groups-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 900px) { .groups-row { grid-template-columns: 1fr; } }
+
+.group-panel {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.group-header {
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.group-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.group-a .group-title { color: var(--netherite); }
+.group-b .group-title { color: var(--gold); }
+.finals-panel .group-title { color: var(--diamond); }
+
+.group-a { border-top: 2px solid var(--netherite); }
+.group-b { border-top: 2px solid var(--gold); }
+.finals-panel { border-top: 2px solid var(--diamond); }
+
+.group-tiers {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* ── PLAYER TABLE ── */
+.player-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.player-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+
+.player-table th.r, .player-table td.r { text-align: right; }
+
+.player-table tbody tr {
+  border-bottom: 1px solid rgba(37,42,56,0.6);
+  transition: background 0.15s;
+  animation: fadeUp 0.35s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(6px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.player-table tbody tr:hover { background: rgba(56,212,248,0.03); }
+
+.player-table td { padding: 12px 16px; font-size: 13px; }
+
+.rank-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  width: 32px;
+}
+
+.pname {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.tier-pill {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  padding: 2px 7px;
+  text-transform: uppercase;
+  margin-left: 8px;
+  border-radius: 2px;
+}
+
+.t-coal      { background: rgba(158,128,96,0.12);  color: var(--coal);      border: 1px solid rgba(158,128,96,0.3);  }
+.t-iron      { background: rgba(176,190,200,0.12); color: var(--iron);      border: 1px solid rgba(176,190,200,0.3); }
+.t-gold      { background: rgba(240,192,64,0.1);   color: var(--gold);      border: 1px solid rgba(240,192,64,0.3);  }
+.t-emerald   { background: rgba(64,216,120,0.1);   color: var(--emerald);   border: 1px solid rgba(64,216,120,0.3);  }
+.t-diamond   { background: rgba(56,212,248,0.1);   color: var(--diamond);   border: 1px solid rgba(56,212,248,0.3);  }
+.t-netherite { background: rgba(200,122,240,0.1);  color: var(--netherite); border: 1px solid rgba(200,122,240,0.3); }
+
+.pts-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--diamond);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.pts-val.top { color: var(--emerald); }
+
+.status-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  padding: 3px 9px;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+.s-alive      { color: var(--alive);     border: 1px solid rgba(56,212,248,0.3);  background: rgba(56,212,248,0.05);  }
+.s-qualified  { color: var(--qualified); border: 1px solid rgba(64,216,120,0.3);  background: rgba(64,216,120,0.05);  }
+.s-eliminated { color: var(--eliminated);border: 1px solid rgba(255,58,58,0.3);   background: rgba(255,58,58,0.05);   }
+.s-pending    { color: var(--pending);   border: 1px solid rgba(240,192,64,0.3);  background: rgba(240,192,64,0.05);  }
+
+tr.is-eliminated td { opacity: 0.4; }
+tr.is-eliminated .pname { text-decoration: line-through; }
+
+/* ── BLOCK TIMELINE ── */
+.block-timeline {
+  display: flex;
+  gap: 0;
+  margin-bottom: 32px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.block-step {
+  flex: 1;
+  min-width: 130px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-right: none;
+  position: relative;
+}
+.block-step:last-child { border-right: 1px solid var(--border); }
+
+.block-step.active-block {
+  background: var(--surface2);
+  border-color: var(--diamond);
+}
+
+.block-step.done-block { opacity: 0.6; }
+
+.block-step-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.block-step-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.block-step.active-block .block-step-title { color: var(--diamond); }
+
+.block-step-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.block-step-elim {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--eliminated);
+  margin-top: 4px;
+}
+
+/* ── SEEDS TABLE ── */
+.seeds-section { margin-bottom: 40px; }
+
+.seeds-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.seeds-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.block-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 5px 14px;
+  text-transform: uppercase;
+}
+
+.block-tag-a { color: var(--netherite); border: 1px solid rgba(200,122,240,0.4); background: rgba(200,122,240,0.06); }
+.block-tag-b { color: var(--gold);      border: 1px solid rgba(240,192,64,0.4);  background: rgba(240,192,64,0.06);  }
+.block-tag-f { color: var(--diamond);   border: 1px solid rgba(56,212,248,0.4);  background: rgba(56,212,248,0.06);  }
+
+.seeds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.seed-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.3s ease both;
+  transition: border-color 0.2s;
+}
+.seed-card:hover { border-color: var(--border2); }
+
+.seed-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.seed-card.grp-a::before { background: linear-gradient(90deg, var(--netherite), transparent); }
+.seed-card.grp-b::before { background: linear-gradient(90deg, var(--gold), transparent); }
+.seed-card.grp-f::before { background: linear-gradient(90deg, var(--diamond), transparent); }
+.seed-card.grp-pending::before { background: linear-gradient(90deg, var(--muted), transparent); }
+
+.seed-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.seed-results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.seed-result-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.seed-pos {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  width: 28px;
+  flex-shrink: 0;
+}
+.seed-pos.p1 { color: var(--gold); font-weight: 700; }
+.seed-pos.p2 { color: var(--iron); }
+.seed-pos.p3 { color: var(--coal); }
+
+.seed-pname { flex: 1; font-weight: 600; }
+.seed-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+.seed-time.fast { color: var(--emerald); }
+
+.seed-pts-earned {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--diamond);
+  width: 36px;
+  text-align: right;
+}
+
+.seed-pending-msg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  padding: 12px 0 4px;
+}
+
+/* ── RULES ── */
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.rule-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 26px 28px;
+}
+
+.rule-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--diamond);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rule-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(37,42,56,0.5);
+  gap: 16px;
+  font-size: 13px;
+}
+.rule-row:last-child { border-bottom: none; }
+
+.rule-label { color: var(--muted); flex: 1; line-height: 1.5; }
+.rule-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text);
+  text-align: right;
+  flex-shrink: 0;
+}
+.rule-val.c-green  { color: var(--emerald); }
+.rule-val.c-red    { color: var(--eliminated); }
+.rule-val.c-gold   { color: var(--gold); }
+.rule-val.c-purple { color: var(--netherite); }
+
+.pts-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.pts-table th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+.pts-table td {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 7px 8px;
+  border-bottom: 1px solid rgba(37,42,56,0.4);
+  color: var(--text);
+}
+.pts-table td:last-child { color: var(--diamond); font-weight: 600; }
+.pts-table tr:last-child td { border-bottom: none; color: var(--muted); }
+
+.elim-schedule { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+
+.elim-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.elim-block-name {
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 80px;
+}
+
+.elim-seeds { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); flex: 1; }
+.elim-cut   { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--eliminated); }
+.elim-left  { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--emerald); margin-left: auto; }
+
+/* ── FOOTER ── */
+footer {
+  padding: 28px 48px;
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  header { flex-direction: column; align-items: flex-start; padding: 28px 20px 20px; }
+  .tabs, main { padding-left: 20px; padding-right: 20px; }
+  .seeds-grid { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 6px; }
+}
+
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); }
+</style>
+</head>
+<body>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+
+<div class="wrap">
+<header>
+  <div class="title-block">
+    <span class="eyebrow">MacOffs · Minecraft Speedrunning · Mac Only</span>
+    <h1>MacOffs <em>S2</em></h1>
+  </div>
+  <div class="header-right">
+    <span class="phase-badge"><span class="dot"></span>Block 2 — Group A</span>
+    <div class="header-stats">
+      FSG · Private Room · 40+ Players<br>
+      3 Seeds per Block · 20-Min Cap<br>
+      Top 5 per group → Finals
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" onclick="switchTab('standings',this)">Standings</button>
+  <button class="tab" onclick="switchTab('seeds',this)">Seeds</button>
+  <button class="tab" onclick="switchTab('rules',this)">Format &amp; Rules</button>
+</nav>
+
+<main>
+
+<!-- ══ STANDINGS ══ -->
+<section id="standings" class="section active">
+
+  <div class="stat-strip">
+    <div class="stat-item">
+      <div class="stat-label">Total Players</div>
+      <div class="stat-val c-diamond">42</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Group A</div>
+      <div class="stat-val c-netherite">18</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Group B</div>
+      <div class="stat-val c-gold">24</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Current Block</div>
+      <div class="stat-val c-emerald">2</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Seeds Played</div>
+      <div class="stat-val">3</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-label">Eliminated</div>
+      <div class="stat-val" style="color:var(--eliminated)">8</div>
+    </div>
+  </div>
+
+  <!-- BLOCK TIMELINE -->
+  <div class="block-timeline">
+    <div class="block-step done-block">
+      <div class="block-step-label">Block 1</div>
+      <div class="block-step-title">Seeds 1–3</div>
+      <div class="block-step-sub">Both Groups</div>
+      <div class="block-step-elim">−4 per group</div>
+    </div>
+    <div class="block-step active-block">
+      <div class="block-step-label">Block 2 ← Now</div>
+      <div class="block-step-title">Seeds 4–6</div>
+      <div class="block-step-sub">Both Groups</div>
+      <div class="block-step-elim">−3 per group</div>
+    </div>
+    <div class="block-step">
+      <div class="block-step-label">Block 3</div>
+      <div class="block-step-title">Seeds 7–9</div>
+      <div class="block-step-sub">Both Groups</div>
+      <div class="block-step-elim">−3 per group</div>
+    </div>
+    <div class="block-step">
+      <div class="block-step-label">Block 4</div>
+      <div class="block-step-title">Seeds 10–12</div>
+      <div class="block-step-sub">Both Groups</div>
+      <div class="block-step-elim">Top 5 → Finals</div>
+    </div>
+    <div class="block-step">
+      <div class="block-step-label">Finals</div>
+      <div class="block-step-title">Seeds 13–15</div>
+      <div class="block-step-sub">Merged · Top 10</div>
+      <div class="block-step-elim" style="color:var(--emerald)">Winner takes all</div>
+    </div>
+  </div>
+
+  <div class="groups-row">
+    <!-- GROUP A -->
+    <div class="group-panel group-a">
+      <div class="group-header">
+        <div>
+          <div class="group-title">Group A</div>
+          <div class="group-tiers">Netherite · Diamond · Emerald</div>
+        </div>
+        <span class="status-tag s-alive">Block 2</span>
+      </div>
+      <table class="player-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th class="r">Pts</th>
+            <th class="r">Status</th>
+          </tr>
+        </thead>
+        <tbody id="group-a-body"></tbody>
+      </table>
+    </div>
+
+    <!-- GROUP B -->
+    <div class="group-panel group-b">
+      <div class="group-header">
+        <div>
+          <div class="group-title">Group B</div>
+          <div class="group-tiers">Gold · Iron · Coal</div>
+        </div>
+        <span class="status-tag s-pending">Waiting</span>
+      </div>
+      <table class="player-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th class="r">Pts</th>
+            <th class="r">Status</th>
+          </tr>
+        </thead>
+        <tbody id="group-b-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FINALS panel (shown when populated) -->
+  <div class="group-panel finals-panel" id="finals-panel" style="display:none; margin-top: 0;">
+    <div class="group-header">
+      <div>
+        <div class="group-title">Finals — Merged Field</div>
+        <div class="group-tiers">Top 5 Group A + Top 5 Group B</div>
+      </div>
+      <span class="status-tag s-qualified">Seeds 13–15</span>
+    </div>
+    <table class="player-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th class="r">Pts</th>
+          <th class="r">Origin</th>
+          <th class="r">Status</th>
+        </tr>
+      </thead>
+      <tbody id="finals-body"></tbody>
+    </table>
+  </div>
+
+</section>
+
+<!-- ══ SEEDS ══ -->
+<section id="seeds" class="section">
+
+  <div class="seeds-section" id="seeds-a-block1">
+    <div class="seeds-header">
+      <span class="seeds-title">Group A</span>
+      <span class="block-tag block-tag-a">Block 1 · Seeds 1–3</span>
+    </div>
+    <div class="seeds-grid" id="seeds-a-b1-grid"></div>
+  </div>
+
+  <div class="seeds-section" id="seeds-b-block1">
+    <div class="seeds-header">
+      <span class="seeds-title">Group B</span>
+      <span class="block-tag block-tag-b">Block 1 · Seeds 1–3</span>
+    </div>
+    <div class="seeds-grid" id="seeds-b-b1-grid"></div>
+  </div>
+
+  <div class="seeds-section">
+    <div class="seeds-header">
+      <span class="seeds-title">Group A</span>
+      <span class="block-tag block-tag-a">Block 2 · Seeds 4–6</span>
+    </div>
+    <div class="seeds-grid" id="seeds-a-b2-grid"></div>
+  </div>
+
+  <div class="seeds-section">
+    <div class="seeds-header">
+      <span class="seeds-title">Group B</span>
+      <span class="block-tag block-tag-b">Block 2 · Seeds 4–6</span>
+    </div>
+    <div class="seeds-grid" id="seeds-b-b2-grid"></div>
+  </div>
+
+</section>
+
+<!-- ══ RULES ══ -->
+<section id="rules" class="section">
+  <div class="rules-grid">
+
+    <div class="rule-card">
+      <div class="rule-card-title">Points Per Seed</div>
+      <table class="pts-table">
+        <thead><tr><th>Finish</th><th>Points</th></tr></thead>
+        <tbody>
+          <tr><td>1st</td><td>12</td></tr>
+          <tr><td>2nd</td><td>9</td></tr>
+          <tr><td>3rd</td><td>7</td></tr>
+          <tr><td>4th</td><td>5</td></tr>
+          <tr><td>5th</td><td>4</td></tr>
+          <tr><td>6th</td><td>3</td></tr>
+          <tr><td>7th</td><td>2</td></tr>
+          <tr><td>8th</td><td>1</td></tr>
+          <tr><td>9th</td><td>1</td></tr>
+          <tr><td>DNF / 10th+</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-card-title">DNF Rules</div>
+      <div class="rule-row"><span class="rule-label">Time cap per seed</span><span class="rule-val c-red">20:00</span></div>
+      <div class="rule-row"><span class="rule-label">DNF threshold</span><span class="rule-val">10th place or past cap</span></div>
+      <div class="rule-row"><span class="rule-label">DNF points</span><span class="rule-val">0 pts</span></div>
+      <div class="rule-row"><span class="rule-label">Points reset</span><span class="rule-val c-gold">Every block</span></div>
+      <div class="rule-row"><span class="rule-label">Tiebreaker</span><span class="rule-val">Best single seed time</span></div>
+      <div class="rule-row"><span class="rule-label">2nd tiebreaker</span><span class="rule-val">Fewest DNFs in block</span></div>
+      <div class="rule-row"><span class="rule-label">3rd tiebreaker</span><span class="rule-val c-green">Sudden death seed</span></div>
+    </div>
+
+    <div class="rule-card">
+      <div class="rule-card-title">Group Split</div>
+      <div class="rule-row"><span class="rule-label">Group A</span><span class="rule-val c-purple">Netherite + Diamond + Emerald</span></div>
+      <div class="rule-row"><span class="rule-label">Group B</span><span class="rule-val c-gold">Gold + Iron + Coal</span></div>
+      <div class="rule-row"><span class="rule-label">Groups run</span><span class="rule-val">Sequentially, not parallel</span></div>
+      <div class="rule-row"><span class="rule-label">Seeds shared?</span><span class="rule-val c-red">No — different seeds per group</span></div>
+      <div class="rule-row"><span class="rule-label">Merge point</span><span class="rule-val c-green">After Block 4</span></div>
+      <div class="rule-row"><span class="rule-label">Finals field</span><span class="rule-val">Top 5 A + Top 5 B = 10 players</span></div>
+    </div>
+
+    <div class="rule-card" style="grid-column: 1 / -1;">
+      <div class="rule-card-title">Elimination Schedule</div>
+      <div style="display:flex; gap:24px; margin-bottom:20px; flex-wrap:wrap;">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted);">
+          Group A: <span id="display-count-a" style="color:var(--netherite); font-weight:600;"></span> players
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted);">
+          Group B: <span id="display-count-b" style="color:var(--gold); font-weight:600;"></span> players
+        </div>
+      </div>
+      <div class="elim-schedule" id="elim-calc-output"></div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); margin-top:12px; line-height:1.7;" id="elim-formula-note"></div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>MacOffs Season 2 · FSG Format</span>
+  <span>Edit DATA block in script to update live</span>
+</footer>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+//  DATA — edit this to update the scoreboard
+// ════════════════════════════════════════════════════
+
+// status: "alive" | "eliminated" | "qualified" | "pending"
+const groupA = [
+  { name: "Cubie",       tier: "netherite", blockPts: [28, 0], status: "alive"      },
+  { name: "Vortexigo",   tier: "netherite", blockPts: [24, 0], status: "alive"      },
+  { name: "PhantomPB",   tier: "diamond",   blockPts: [21, 0], status: "alive"      },
+  { name: "StrikeRun",   tier: "diamond",   blockPts: [19, 0], status: "alive"      },
+  { name: "BlindPig",    tier: "diamond",   blockPts: [17, 0], status: "alive"      },
+  { name: "NovaSplit",   tier: "emerald",   blockPts: [15, 0], status: "alive"      },
+  { name: "Aqueii",      tier: "emerald",   blockPts: [14, 0], status: "alive"      },
+  { name: "Praxis",      tier: "emerald",   blockPts: [13, 0], status: "alive"      },
+  { name: "ZenithPace",  tier: "emerald",   blockPts: [12, 0], status: "alive"      },
+  { name: "IceWarden",   tier: "diamond",   blockPts: [11, 0], status: "alive"      },
+  { name: "LunarBaast",  tier: "emerald",   blockPts: [10, 0], status: "alive"      },
+  { name: "Runix7",      tier: "emerald",   blockPts: [9,  0], status: "alive"      },
+  { name: "NetherDash",  tier: "diamond",   blockPts: [8,  0], status: "alive"      },
+  { name: "OverVoid",    tier: "netherite", blockPts: [6,  0], status: "alive"      },
+  { name: "FrostBridge", tier: "emerald",   blockPts: [4,  0], status: "eliminated" },
+  { name: "GravelGod",   tier: "diamond",   blockPts: [3,  0], status: "eliminated" },
+  { name: "SlabRat",     tier: "emerald",   blockPts: [2,  0], status: "eliminated" },
+  { name: "Zebrux",      tier: "emerald",   blockPts: [1,  0], status: "eliminated" },
+];
+
+const groupB = [
+  { name: "CreeperKing",  tier: "gold",  blockPts: [26, 0], status: "alive"      },
+  { name: "StoneCraft",   tier: "gold",  blockPts: [22, 0], status: "alive"      },
+  { name: "BogsRun",      tier: "gold",  blockPts: [20, 0], status: "alive"      },
+  { name: "WarpSpeed",    tier: "iron",  blockPts: [18, 0], status: "alive"      },
+  { name: "DirtRunner",   tier: "gold",  blockPts: [16, 0], status: "alive"      },
+  { name: "NightCrawl",   tier: "iron",  blockPts: [14, 0], status: "alive"      },
+  { name: "SpawnSet",     tier: "gold",  blockPts: [13, 0], status: "alive"      },
+  { name: "BedroQuen",    tier: "iron",  blockPts: [12, 0], status: "alive"      },
+  { name: "PiglinPact",   tier: "gold",  blockPts: [11, 0], status: "alive"      },
+  { name: "MossRacer",    tier: "iron",  blockPts: [10, 0], status: "alive"      },
+  { name: "CaveRunner",   tier: "coal",  blockPts: [9,  0], status: "alive"      },
+  { name: "GlowRoot",     tier: "iron",  blockPts: [8,  0], status: "alive"      },
+  { name: "LavaLeap",     tier: "coal",  blockPts: [7,  0], status: "alive"      },
+  { name: "ObsidCraft",   tier: "gold",  blockPts: [6,  0], status: "alive"      },
+  { name: "QuartzRush",   tier: "iron",  blockPts: [4,  0], status: "eliminated" },
+  { name: "EndPortl",     tier: "coal",  blockPts: [3,  0], status: "eliminated" },
+  { name: "NetherBrick",  tier: "coal",  blockPts: [2,  0], status: "eliminated" },
+  { name: "BlazePowdr",   tier: "coal",  blockPts: [1,  0], status: "eliminated" },
+  { name: "PearlDrop",    tier: "iron",  blockPts: [1,  0], status: "eliminated" },  
+  { name: "BasaltBoy",    tier: "coal",  blockPts: [0,  0], status: "eliminated" },
+];
+
+// currentBlock: which block pts to show (1-indexed)
+const currentBlock = 2;
+
+// Seed results — null result = pending
+// Each seed: { group, block, seedNum, results: [{name, time, pts}] | null }
+const seedResults = [
+  // GROUP A — BLOCK 1
+  {
+    group: "a", block: 1, seedNum: 1,
+    results: [
+      { name: "Cubie",      time: "8:14", pts: 12 },
+      { name: "Vortexigo",  time: "8:55", pts: 9  },
+      { name: "PhantomPB",  time: "9:02", pts: 7  },
+      { name: "StrikeRun",  time: "9:44", pts: 5  },
+      { name: "BlindPig",   time: "10:11",pts: 4  },
+      { name: "NovaSplit",  time: "11:22",pts: 3  },
+      { name: "Aqueii",     time: "12:05",pts: 2  },
+      { name: "Praxis",     time: "13:40",pts: 1  },
+    ]
+  },
+  {
+    group: "a", block: 1, seedNum: 2,
+    results: [
+      { name: "Vortexigo",  time: "8:33", pts: 12 },
+      { name: "Cubie",      time: "8:50", pts: 9  },
+      { name: "OverVoid",   time: "9:11", pts: 7  },
+      { name: "StrikeRun",  time: "9:55", pts: 5  },
+      { name: "PhantomPB",  time: "10:22",pts: 4  },
+      { name: "IceWarden",  time: "11:30",pts: 3  },
+      { name: "ZenithPace", time: "12:00",pts: 2  },
+      { name: "LunarBaast", time: "13:10",pts: 1  },
+    ]
+  },
+  {
+    group: "a", block: 1, seedNum: 3,
+    results: [
+      { name: "PhantomPB",  time: "8:59", pts: 12 },
+      { name: "Cubie",      time: "9:05", pts: 9  },
+      { name: "BlindPig",   time: "9:44", pts: 7  },
+      { name: "NovaSplit",  time: "10:55",pts: 5  },
+      { name: "Aqueii",     time: "11:44",pts: 4  },
+      { name: "Praxis",     time: "12:22",pts: 3  },
+      { name: "NetherDash", time: "13:00",pts: 2  },
+      { name: "Runix7",     time: "14:55",pts: 1  },
+    ]
+  },
+  // GROUP B — BLOCK 1
+  {
+    group: "b", block: 1, seedNum: 1,
+    results: [
+      { name: "CreeperKing", time: "10:05",pts: 12 },
+      { name: "StoneCraft",  time: "11:22",pts: 9  },
+      { name: "BogsRun",     time: "12:00",pts: 7  },
+      { name: "WarpSpeed",   time: "12:44",pts: 5  },
+      { name: "DirtRunner",  time: "13:10",pts: 4  },
+      { name: "NightCrawl",  time: "14:05",pts: 3  },
+      { name: "SpawnSet",    time: "15:22",pts: 2  },
+      { name: "BedroQuen",   time: "16:00",pts: 1  },
+    ]
+  },
+  {
+    group: "b", block: 1, seedNum: 2,
+    results: [
+      { name: "StoneCraft",  time: "11:05",pts: 12 },
+      { name: "CreeperKing", time: "11:40",pts: 9  },
+      { name: "WarpSpeed",   time: "12:22",pts: 7  },
+      { name: "PiglinPact",  time: "13:00",pts: 5  },
+      { name: "BogsRun",     time: "13:44",pts: 4  },
+      { name: "MossRacer",   time: "14:30",pts: 3  },
+      { name: "CaveRunner",  time: "15:11",pts: 2  },
+      { name: "GlowRoot",    time: "16:40",pts: 1  },
+    ]
+  },
+  {
+    group: "b", block: 1, seedNum: 3,
+    results: [
+      { name: "BogsRun",     time: "11:22",pts: 12 },
+      { name: "DirtRunner",  time: "12:00",pts: 9  },
+      { name: "CreeperKing", time: "12:30",pts: 7  },
+      { name: "NightCrawl",  time: "13:44",pts: 5  },
+      { name: "SpawnSet",    time: "14:55",pts: 4  },
+      { name: "ObsidCraft",  time: "15:22",pts: 3  },
+      { name: "LavaLeap",    time: "16:00",pts: 2  },
+      { name: "BedroQuen",   time: "17:10",pts: 1  },
+    ]
+  },
+  // GROUP A — BLOCK 2 (in progress)
+  { group: "a", block: 2, seedNum: 4, results: null },
+  { group: "a", block: 2, seedNum: 5, results: null },
+  { group: "a", block: 2, seedNum: 6, results: null },
+  // GROUP B — BLOCK 2 (pending)
+  { group: "b", block: 2, seedNum: 4, results: null },
+  { group: "b", block: 2, seedNum: 5, results: null },
+  { group: "b", block: 2, seedNum: 6, results: null },
+];
+
+// ════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════
+
+function totalPts(player) {
+  return player.blockPts.reduce((a, b) => a + b, 0);
+}
+
+function renderGroup(players, tbodyId) {
+  const sorted = [...players].sort((a, b) => {
+    if (a.status === 'eliminated' && b.status !== 'eliminated') return 1;
+    if (b.status === 'eliminated' && a.status !== 'eliminated') return -1;
+    return totalPts(b) - totalPts(a);
+  });
+
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = '';
+
+  sorted.forEach((p, i) => {
+    const pts = totalPts(p);
+    const isTop = i < 5 && p.status !== 'eliminated';
+    const statusClass = p.status === 'eliminated' ? 's-eliminated' :
+                        p.status === 'qualified'  ? 's-qualified'  :
+                        p.status === 'pending'    ? 's-pending'    : 's-alive';
+    const statusLabel = p.status === 'eliminated' ? 'OUT' :
+                        p.status === 'qualified'  ? 'FINALS' :
+                        p.status === 'pending'    ? 'WAITING' : 'ALIVE';
+    const elim = p.status === 'eliminated' ? 'is-eliminated' : '';
+
+    const tr = document.createElement('tr');
+    tr.className = elim;
+    tr.style.animationDelay = `${i * 35}ms`;
+    tr.innerHTML = `
+      <td class="rank-num">${p.status !== 'eliminated' ? i + 1 : '—'}</td>
+      <td><span class="pname">${p.name}</span><span class="tier-pill t-${p.tier}">${p.tier}</span></td>
+      <td class="r"><span class="pts-val ${isTop ? 'top' : ''}">${pts}</span></td>
+      <td class="r"><span class="status-tag ${statusClass}">${statusLabel}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderSeeds(group, block, gridId) {
+  const seeds = seedResults.filter(s => s.group === group && s.block === block);
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  seeds.forEach((s, si) => {
+    const card = document.createElement('div');
+    const grpClass = s.results ? `grp-${s.group}` : 'grp-pending';
+    card.className = `seed-card ${grpClass}`;
+    card.style.animationDelay = `${si * 50}ms`;
+
+    const label = `Seed ${s.seedNum} · Group ${s.group.toUpperCase()} · Block ${s.block}`;
+
+    if (!s.results) {
+      card.innerHTML = `
+        <div class="seed-meta">${label}</div>
+        <div class="seed-pending-msg">— PENDING —</div>
+      `;
+    } else {
+      const rows = s.results.map((r, ri) => {
+        const posClass = ri === 0 ? 'p1' : ri === 1 ? 'p2' : ri === 2 ? 'p3' : '';
+        const posLabel = ri === 0 ? '1st' : ri === 1 ? '2nd' : ri === 2 ? '3rd' : `${ri+1}th`;
+        const fastClass = parseTime(r.time) < 600 ? 'fast' : '';
+        return `
+          <div class="seed-result-row">
+            <span class="seed-pos ${posClass}">${posLabel}</span>
+            <span class="seed-pname">${r.name}</span>
+            <span class="seed-time ${fastClass}">${r.time}</span>
+            <span class="seed-pts-earned">+${r.pts}</span>
+          </div>
+        `;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="seed-meta">${label}</div>
+        <div class="seed-results">${rows}</div>
+      `;
+    }
+    grid.appendChild(card);
+  });
+}
+
+function parseTime(t) {
+  if (!t || t === '—') return 9999;
+  const [m, s] = t.split(':').map(Number);
+  return m * 60 + (s || 0);
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── ELIMINATION CALCULATOR ──
+function calcElim(N) {
+  // Target: 5 players reach Finals from each group
+  const target = 5;
+  const surplus = Math.max(N - target, 0);
+  const cut1 = Math.round(surplus * 0.40);
+  const cut2 = Math.round(surplus * 0.30);
+  const cut3 = Math.round(surplus * 0.20);
+  // Block 4 cut = whatever's left after blocks 1-3 to land exactly at target
+  const after1 = N - cut1;
+  const after2 = after1 - cut2;
+  const after3 = after2 - cut3;
+  const cut4 = Math.max(after3 - target, 0);
+  return { cut1, cut2, cut3, cut4, after1, after2, after3, finals: Math.min(after3 - cut4, target) };
+}
+
+function runCalc() {
+  const nA = groupA.length;
+  const nB = groupB.length;
+  document.getElementById('display-count-a').textContent = nA;
+  document.getElementById('display-count-b').textContent = nB;
+  const a = calcElim(nA);
+  const b = calcElim(nB);
+  const out = document.getElementById('elim-calc-output');
+
+  const blocks = [
+    { name: 'Block 1', seeds: '1–3',   cutA: a.cut1, cutB: b.cut1, leftA: a.after1, leftB: b.after1 },
+    { name: 'Block 2', seeds: '4–6',   cutA: a.cut2, cutB: b.cut2, leftA: a.after2, leftB: b.after2 },
+    { name: 'Block 3', seeds: '7–9',   cutA: a.cut3, cutB: b.cut3, leftA: a.after3, leftB: b.after3 },
+    { name: 'Block 4', seeds: '10–12', cutA: a.cut4, cutB: b.cut4, leftA: a.finals, leftB: b.finals },
+  ];
+
+  out.innerHTML = blocks.map(bl => `
+    <div class="elim-row">
+      <span class="elim-block-name">${bl.name}</span>
+      <span class="elim-seeds">Seeds ${bl.seeds}</span>
+      <span class="elim-cut" style="color:var(--netherite)">A: −${bl.cutA}</span>
+      <span class="elim-cut">B: −${bl.cutB}</span>
+      <span class="elim-left">A: ${bl.leftA} left · B: ${bl.leftB} left</span>
+    </div>
+  `).join('') + `
+    <div class="elim-row" style="border-color:var(--diamond)">
+      <span class="elim-block-name" style="color:var(--diamond)">Finals</span>
+      <span class="elim-seeds">Seeds 13–15</span>
+      <span class="elim-cut" style="color:var(--diamond)">Top 5 A + Top 5 B</span>
+      <span class="elim-left" style="color:var(--emerald)">🏆 ${a.finals + b.finals} players</span>
+    </div>
+  `;
+
+  document.getElementById('elim-formula-note').innerHTML =
+    `Formula: surplus = N − 5 &nbsp;·&nbsp; Block 1 = 40% of surplus &nbsp;·&nbsp; Block 2 = 30% &nbsp;·&nbsp; Block 3 = 20% &nbsp;·&nbsp; Block 4 = remainder<br>
+     Group A: ${nA} players → surplus ${Math.max(nA-5,0)} → cuts ${a.cut1} / ${a.cut2} / ${a.cut3} / ${a.cut4}<br>
+     Group B: ${nB} players → surplus ${Math.max(nB-5,0)} → cuts ${b.cut1} / ${b.cut2} / ${b.cut3} / ${b.cut4}`;
+}
+
+// Init
+renderGroup(groupA, 'group-a-body');
+renderGroup(groupB, 'group-b-body');
+renderSeeds('a', 1, 'seeds-a-b1-grid');
+renderSeeds('b', 1, 'seeds-b-b1-grid');
+renderSeeds('a', 2, 'seeds-a-b2-grid');
+renderSeeds('b', 2, 'seeds-b-b2-grid');
+runCalc();
+</script>
+</body>
+</html>
