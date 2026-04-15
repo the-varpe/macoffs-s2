@@ -15,7 +15,7 @@ const groupA = [
 ];
 
 const groupB = [
-  { name: "thevarpe", tier: "gold", status: "qualified" },
+  { name: "thevarpe", tier: "gold", status: "alive" },
 ];
 
 // ── SEED RESULTS ──
