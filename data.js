@@ -6,16 +6,19 @@
 
 // ── CURRENT BLOCK: 1, 2, 3, 4, or 5 (5 = Finals) ──
 // CHANGE ACCORDING TO CURRENT BLOCK ----------------------------------------------------------------
-const currentBlock = 1;
+const currentBlock = 5;
 
 // ── PLAYERS ──
 // status: "alive" | "eliminated" | "qualified" | "pending"
 
 const groupA = [
+  { name: "thevarpe", tier: "netherite", status: "qualified" },
+  { name: "thevarpeagain", tier: "diamond iii", status: "eliminated"},
 ];
 
 const groupB = [
-  { name: "thevarpe", tier: "gold", status: "alive" },
+  { name: "thevarpe", tier: "gold i", status: "alive" },
+  { name: "thevarpe", tier: "coal ii", status: "pending"},
 ];
 
 // ── SEED RESULTS ──
