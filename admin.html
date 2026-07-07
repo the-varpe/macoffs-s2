@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MacOffs S2 — Admin Panel</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oxanium:wght@600;800&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #080a0d;
+        --surface: #13161e;
+        --border: #252a38;
+        --text: #dde3f0;
+        --muted: #5a6380;
+        --diamond: #38d4f8;
+        --eliminated: #ff3a3a;
+        --emerald: #40d878;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Oxanium", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(56, 212, 248, 0.01) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(56, 212, 248, 0.01) 1px, transparent 1px);
+        background-size: 48px 48px;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .admin-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-top: 3px solid var(--diamond);
+        width: 100%;
+        max-width: 500px;
+        padding: 40px;
+        position: relative;
+        z-index: 1;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 6px;
+        letter-spacing: -0.5px;
+      }
+      .subtitle {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+      }
+      .btn {
+        display: block;
+        width: 100%;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 16px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+      .btn-lock {
+        border-color: var(--diamond);
+        color: var(--diamond);
+        background: rgba(56, 212, 248, 0.06);
+      }
+      .btn-lock:hover {
+        background: rgba(56, 212, 248, 0.15);
+      }
+      .btn-clear {
+        border-color: var(--eliminated);
+        color: var(--eliminated);
+        background: rgba(255, 58, 58, 0.06);
+        margin-top: 40px;
+        margin-bottom: 0;
+      }
+      .btn-clear:hover {
+        background: rgba(255, 58, 58, 0.15);
+      }
+      .status-log {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        background: #090b10;
+        border: 1px solid var(--border);
+        padding: 12px;
+        color: var(--muted);
+        min-height: 40px;
+        max-height: 120px;
+        overflow-y: auto;
+      }
+      .log-entry {
+        margin-bottom: 4px;
+      }
+      .log-success {
+        color: var(--emerald);
+      }
+      .log-error {
+        color: var(--eliminated);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-card">
+      <h1>Tournament Console</h1>
+      <div class="subtitle">MacOffs S2 Control Panel</div>
+
+      <button onclick="triggerLock()" class="btn btn-lock">
+        🔒 Retrieve & Lock Latest Match
+      </button>
+
+      <div
+        style="
+          margin-top: 24px;
+          margin-bottom: 8px;
+          font-family: &quot;JetBrains Mono&quot;, monospace;
+          font-size: 10px;
+          color: var(--muted);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        "
+      >
+        Console Output:
+      </div>
+      <div class="status-log" id="admin-log">
+        <div class="log-entry">System ready. Waiting for action...</div>
+      </div>
+
+      <button onclick="triggerReset()" class="btn btn-clear">
+        ⚠️ Clear All Tournament Data
+      </button>
+    </div>
+
+    <script src="data.js"></script>
+    <script>
+      const logEl = document.getElementById("admin-log");
+
+      function log(message, type = "") {
+        const entry = document.createElement("div");
+        entry.className = `log-entry ${type ? "log-" + type : ""}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logEl.appendChild(entry);
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+
+      // Capture standard alert strings to route them straight into our console box
+      window.alert = (msg) => {
+        if (msg.includes("Success")) log(msg, "success");
+        else if (
+          msg.includes("Failed") ||
+          msg.includes("ignored") ||
+          msg.includes("already")
+        )
+          log(msg, "error");
+        else log(msg);
+      };
+
+      async function triggerLock() {
+        log("Querying API for the host's most recent match...");
+        await lockLatestMatch();
+      }
+
+      function triggerReset() {
+        resetTournamentBoard();
+      }
+    </script>
+  </body>
+</html>
