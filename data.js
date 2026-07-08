@@ -1,108 +1,122 @@
 // ════════════════════════════════════════════════════
-//  MacOffs Season 2 — Stable Storage & API Sync Data
+//  MacOffs Season 2 — Secure Cloud Engine
 // ════════════════════════════════════════════════════
 
-// 1. Configure your Tournament Host (The account hosting the private rooms)
-const TOURNAMENT_HOST = "thevarpe";
-
-// 2. Set your Current Block: 1, 2, or 3 (3 = Finals)
 const currentBlock = 1;
+const syncChannel = new BroadcastChannel("macoffs_sync");
 
-// 3. Define your static player rosters
+// --- ROSTERS ---
 const groupA = [
   { name: "imnotnyle", tier: "emerald", status: "alive" },
   { name: "ReaganMCSR", tier: "emerald", status: "alive" },
   { name: "Marinos353", tier: "emerald", status: "alive" },
   { name: "rouxzzcfop", tier: "emerald", status: "alive" },
+  { name: "Plyers8", tier: "diamond", status: "alive" },
   { name: "blzako", tier: "emerald", status: "alive" },
   { name: "PoloTheElephant", tier: "emerald", status: "alive" },
   { name: "BlueFalcon1423", tier: "emerald", status: "alive" },
   { name: "FrenchFryJ ", tier: "emerald", status: "alive" },
   { name: "magga1a", tier: "emerald", status: "alive" },
   { name: "winterfairs", tier: "emerald", status: "alive" },
-  { name: "johnplumber", tier: "emerald", status: "alive" },
   { name: "K1lby", tier: "diamond", status: "alive" },
+  { name: "qrynch", tier: "emerald", status: "alive" },
   { name: "FlaxyB", tier: "diamond", status: "alive" },
+  { name: "johnplumber", tier: "emerald", status: "alive" },
   { name: "aurazz_", tier: "diamond", status: "alive" },
-  { name: "Plyers8", tier: "diamond", status: "alive" },
   { name: "Crazyfly072", tier: "diamond", status: "alive" },
-  //{ name: "ZeRoIsNot0", tier: "iron", status: "alive" },
+  { name: "XerxthePhyrst", tier: "emerald", status: "alive" },
+
+  // { name: "ZeRoIsNot0", tier: "iron", status: "alive" },
   // ... add the rest of Group A players
 ];
 
 const groupB = [
   { name: "Aannini", tier: "coal", status: "alive" },
   { name: "WarpedKun", tier: "coal", status: "alive" },
+  { name: "Beatricee", tier: "gold", status: "alive" },
   { name: "theredpro", tier: "iron", status: "alive" },
+  { name: "dreadedguy", tier: "iron", status: "alive" },
   { name: "FBiaLS", tier: "iron", status: "alive" },
   { name: "Yeetone1", tier: "iron", status: "alive" },
-  { name: "dreadedguy", tier: "iron", status: "alive" },
+  { name: "OrangeLmao", tier: "gold", status: "alive" },
   { name: "ZeRoIsNot0", tier: "iron", status: "alive" },
   { name: "voidexed", tier: "iron", status: "alive" },
+  { name: "badbreath", tier: "gold", status: "alive" },
   { name: "ItzSteller", tier: "iron", status: "alive" },
   { name: "Samyli", tier: "gold", status: "alive" },
-  { name: "Chees_It", tier: "gold", status: "alive" },
-  { name: "badbreath", tier: "gold", status: "alive" },
-  { name: "Beatricee_", tier: "gold", status: "alive" },
+  { name: "CheesIt", tier: "gold", status: "alive" },
+  { name: "AdditionalRAM", tier: "gold", status: "alive" },
   // ... add the rest of Group B players
 ];
 
-// Load locked seed results from localStorage on page boot
-let seedResults =
-  JSON.parse(localStorage.getItem("macoffs_seed_results")) || [];
+let seedResults = [];
+let storedMatchIds = [];
 
-// Helper: Convert milliseconds into MM:SS format
+// --- SECURE CLOUD NETWORK FUNCTIONS ---
+async function loadCloudData() {
+  try {
+    const response = await fetch("/.netlify/functions/readData");
+    const data = await response.json();
+    if (data.record) {
+      seedResults = data.record.seedResults || [];
+      storedMatchIds = data.record.savedMatchIds || [];
+    }
+  } catch (err) {
+    console.error("Cloud load error:", err);
+  }
+}
+
+async function saveCloudData() {
+  const response = await fetch("/.netlify/functions/writeData", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ seedResults, savedMatchIds: storedMatchIds }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Database write failed with status ${response.status}`);
+  }
+
+  // Tell other tabs to refresh
+  syncChannel.postMessage("update_data");
+}
+
+// --- LOGIC HELPER FUNCTIONS ---
 function formatMsToTime(ms) {
-  if (!ms || ms >= 1200000) return "—"; // 20-minute cap threshold
+  if (!ms || ms >= 1200000) return "—";
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-// Helper: Calculate points based on finish position
 function calculatePoints(position) {
   const pointsMap = { 1: 12, 2: 9, 3: 7, 4: 5, 5: 4, 6: 3, 7: 2, 8: 1, 9: 1 };
   return pointsMap[position] || 0;
 }
 
-// ── LOCK LATEST MATCH OPERATION ──
+// --- ADMIN CONTROL FUNCTIONS ---
 async function lockLatestMatch() {
   try {
-    console.log("Fetching latest match from API...");
-    // Fetch only the single most recent private room match from the host (type=3 is Private Room)
-    const response = await fetch(
-      `https://api.mcsrranked.com/users/${TOURNAMENT_HOST}/matches?type=3&count=1`,
-    );
-    const json = await response.json();
+    await loadCloudData();
 
-    if (json.status !== "success" || !json.data || json.data.length === 0) {
-      alert("No private room matches found for this host user.");
+    const matchResponse = await fetch("/.netlify/functions/getLatestMatch");
+    const matchData = await matchResponse.json();
+
+    if (matchData.error) {
+      alert(`Error: ${matchData.error}`);
       return;
     }
 
-    const match = json.data[0];
+    const advancedMatch = matchData.data;
 
-    // Avoid double-locking to ensure points aren't awarded twice
-    const storedMatchIds =
-      JSON.parse(localStorage.getItem("macoffs_saved_match_ids")) || [];
-    if (storedMatchIds.includes(match.id)) {
-      alert(`Match ID #${match.id} has already been captured and stored!`);
+    if (storedMatchIds.includes(advancedMatch.id)) {
+      alert(
+        `Match ID #${advancedMatch.id} has already been captured and stored!`,
+      );
       return;
     }
 
-    // Retrieve advanced match data containing completion runtimes
-    const detailResponse = await fetch(
-      `https://api.mcsrranked.com/matches/${match.id}`,
-    );
-    const detailJson = await detailResponse.json();
-    if (detailJson.status !== "success") {
-      alert("Could not load advanced run parameters from the API.");
-      return;
-    }
-    const advancedMatch = detailJson.data;
-
-    // Check match players to see who is active in this instance
     const matchPlayerNames = advancedMatch.players.map((p) =>
       p.nickname.toLowerCase(),
     );
@@ -114,7 +128,7 @@ async function lockLatestMatch() {
     );
 
     let determinedGroup = "pending";
-    let blockNum = currentBlock; // Locked under whatever block you are currently running
+    let blockNum = currentBlock;
 
     if (hasGroupA && hasGroupB) {
       determinedGroup = "f";
@@ -130,7 +144,6 @@ async function lockLatestMatch() {
       return;
     }
 
-    // Count existing runs to figure out the sequential seed count index
     const existingGroupSeeds = seedResults.filter(
       (s) => s.group === determinedGroup && s.block === blockNum,
     );
@@ -139,7 +152,6 @@ async function lockLatestMatch() {
     if (determinedGroup === "b" && blockNum === 2) seedNum += 3;
     if (determinedGroup === "f") seedNum += 6;
 
-    // Map completion records
     const completions = (advancedMatch.completions || []).sort(
       (a, b) => a.time - b.time,
     );
@@ -163,39 +175,28 @@ async function lockLatestMatch() {
       results: parsedResults.length > 0 ? parsedResults : null,
     };
 
-    // Append to local arrays and write straight to localStorage
     seedResults.push(newSeedRecord);
-    storedMatchIds.push(match.id);
+    storedMatchIds.push(advancedMatch.id);
 
-    localStorage.setItem("macoffs_seed_results", JSON.stringify(seedResults));
-    localStorage.setItem(
-      "macoffs_saved_match_ids",
-      JSON.stringify(storedMatchIds),
-    );
-
+    await saveCloudData();
     alert(
-      `Success! Captured Match #${match.id} as Seed ${seedNum} for Group ${determinedGroup.toUpperCase()}.`,
+      `Success! Captured Match #${advancedMatch.id} as Seed ${seedNum} for Group ${determinedGroup.toUpperCase()}.`,
     );
-
-    // Trigger window UI refreshes if functions exist on the current tab
-    if (typeof refreshUI === "function") refreshUI();
-    if (typeof setGroup === "function") setGroup(currentGroup || "a");
   } catch (error) {
     console.error("Lock sequence crash:", error);
-    alert("Failed to track match: check network or logs.");
+    alert(`Failed to track match: ${error.message}`);
   }
 }
 
-// Administrative clear data tool
-function resetTournamentBoard() {
+async function resetTournamentBoard() {
   if (
     confirm(
-      "Are you absolutely sure you want to completely wipe all saved matches from storage? This cannot be undone.",
+      "Are you absolutely sure you want to completely wipe the cloud database?",
     )
   ) {
-    localStorage.removeItem("macoffs_seed_results");
-    localStorage.removeItem("macoffs_saved_match_ids");
     seedResults = [];
-    location.reload();
+    storedMatchIds = [];
+    await saveCloudData();
+    alert("Success! Cloud database wiped.");
   }
 }

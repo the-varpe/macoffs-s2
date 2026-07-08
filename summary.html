@@ -691,7 +691,21 @@
         render();
       });
 
-      setGroup("a");
+      // At the very bottom of summary.html script
+      async function startCommentaryDashboard() {
+        await loadCloudData();
+        setGroup("a"); // Or whichever group is currently active
+      }
+
+      // Listen for the walkie-talkie ping from the Admin Panel
+      syncChannel.onmessage = (event) => {
+        if (event.data === "update_data") {
+          console.log("New data detected! Refreshing commentary view...");
+          startCommentaryDashboard();
+        }
+      };
+
+      startCommentaryDashboard();
     </script>
   </body>
 </html>

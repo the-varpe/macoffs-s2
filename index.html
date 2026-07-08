@@ -905,27 +905,33 @@
           <div class="stat-strip">
             <div class="stat-item">
               <div class="stat-label">Total Players</div>
-              <div class="stat-val c-diamond">42</div>
+              <div class="stat-val c-diamond" id="stat-total">0</div>
             </div>
             <div class="stat-item">
               <div class="stat-label">Group A</div>
-              <div class="stat-val c-netherite">18</div>
+              <div class="stat-val c-netherite" id="stat-group-a">0</div>
             </div>
             <div class="stat-item">
               <div class="stat-label">Group B</div>
-              <div class="stat-val c-gold">24</div>
+              <div class="stat-val c-gold" id="stat-group-b">0</div>
             </div>
             <div class="stat-item">
               <div class="stat-label">Current Block</div>
-              <div class="stat-val c-emerald">2</div>
+              <div class="stat-val c-emerald" id="stat-block">1</div>
             </div>
             <div class="stat-item">
               <div class="stat-label">Seeds Played</div>
-              <div class="stat-val">3</div>
+              <div class="stat-val" id="stat-seeds">0</div>
             </div>
             <div class="stat-item">
               <div class="stat-label">Eliminated</div>
-              <div class="stat-val" style="color: var(--eliminated)">8</div>
+              <div
+                class="stat-val"
+                style="color: var(--eliminated)"
+                id="stat-elim"
+              >
+                0
+              </div>
             </div>
           </div>
 
@@ -944,14 +950,14 @@
               <div class="block-step-label">Block 2</div>
               <div class="block-step-title">Seeds 4–6</div>
               <div class="block-step-sub">Both Groups</div>
-              <div class="block-step-elim">Top 5 → Finals</div>
+              <div class="block-step-elim">Top 3 → Finals</div>
             </div>
             <div class="block-step">
               <div class="block-step-label">Finals</div>
               <div class="block-step-title">Seeds 7–9</div>
-              <div class="block-step-sub">Merged · Top 10</div>
+              <div class="block-step-sub">Merged · Top 6</div>
               <div class="block-step-elim" style="color: var(--emerald)">
-                Winner takes all
+                Extra Fun
               </div>
             </div>
           </div>
@@ -964,7 +970,8 @@
                   <div class="group-title">Group A</div>
                   <div class="group-tiers">Netherite · Diamond · Emerald</div>
                 </div>
-                <span class="status-tag s-alive">Block 2</span>
+                <span class="status-tag s-alive">Block 1</span>
+                <!-- edit the line above -->
               </div>
               <table class="player-table">
                 <thead>
@@ -987,6 +994,7 @@
                   <div class="group-tiers">Gold · Iron · Coal</div>
                 </div>
                 <span class="status-tag s-pending">Waiting</span>
+                <!-- edit the line above -->
               </div>
               <table class="player-table">
                 <thead>
@@ -1011,7 +1019,7 @@
             <div class="group-header">
               <div>
                 <div class="group-title">Finals — Merged Field</div>
-                <div class="group-tiers">Top 5 Group A + Top 5 Group B</div>
+                <div class="group-tiers">Top 3 Group A + Top 3 Group B</div>
               </div>
               <span class="status-tag s-qualified">Seeds 7–9</span>
             </div>
@@ -1149,10 +1157,6 @@
                 ><span class="rule-val">0 pts</span>
               </div>
               <div class="rule-row">
-                <span class="rule-label">Points reset</span
-                ><span class="rule-val c-gold">Every block</span>
-              </div>
-              <div class="rule-row">
                 <span class="rule-label">Tiebreaker</span
                 ><span class="rule-val">Best single seed time</span>
               </div>
@@ -1194,7 +1198,7 @@
               </div>
               <div class="rule-row">
                 <span class="rule-label">Finals field</span
-                ><span class="rule-val">Top 5 A + Top 5 B = 10 players</span>
+                ><span class="rule-val">Top 3 A + Top 3 B = 6 players</span>
               </div>
             </div>
 
@@ -1252,11 +1256,6 @@
           </div>
         </section>
       </main>
-
-      <footer>
-        <span>MacOffs Season 2 · FSG Format</span>
-        <span>Edit DATA block in script to update live</span>
-      </footer>
     </div>
 
     <script src="data.js"></script>
@@ -1293,7 +1292,7 @@
 
         sorted.forEach((p, i) => {
           const pts = totalPts(p);
-          const isTop = i < 5 && p.status !== "eliminated";
+          const isTop = i < 3 && p.status !== "eliminated";
           const statusClass =
             p.status === "eliminated"
               ? "s-eliminated"
@@ -1407,7 +1406,7 @@
       function calcElim(N) {
         // Target: 5 players reach Finals from each group
         // One-day format: 2 blocks per group — Block 1 cuts 60% of surplus, Block 2 cuts remainder
-        const target = 5;
+        const target = 3;
         const surplus = Math.max(N - target, 0);
         const cut1 = Math.round(surplus * 0.6);
         const after1 = N - cut1;
@@ -1462,7 +1461,7 @@
     <div class="elim-row" style="border-color:var(--diamond)">
       <span class="elim-block-name" style="color:var(--diamond)">Finals</span>
       <span class="elim-seeds">Seeds 7–9</span>
-      <span class="elim-cut" style="color:var(--diamond)">Top 5 A + Top 5 B</span>
+      <span class="elim-cut" style="color:var(--diamond)">Top 3 A + Top 3 B</span>
       <span class="elim-left" style="color:var(--emerald)">🏆 ${a.finals + b.finals} players</span>
     </div>
   `;
@@ -1514,8 +1513,33 @@
         renderSeeds("f", 3, "seeds-f-b3-grid");
       }
 
-      // Replace your old "// Init" section at the absolute bottom of index.html with this:
-      function refreshUI() {
+      function updateStatStrip() {
+        const totalA = groupA.length;
+        const totalB = groupB.length;
+        const totalPlayers = totalA + totalB;
+
+        // Count how many players have "eliminated" as their status
+        const elimCount = [...groupA, ...groupB].filter(
+          (p) => p.status === "eliminated",
+        ).length;
+
+        // Apply the calculations to the HTML IDs
+        document.getElementById("stat-total").textContent = totalPlayers;
+        document.getElementById("stat-group-a").textContent = totalA;
+        document.getElementById("stat-group-b").textContent = totalB;
+        document.getElementById("stat-block").textContent = currentBlock;
+        document.getElementById("stat-seeds").textContent = seedResults.length;
+        document.getElementById("stat-elim").textContent = elimCount;
+      }
+      // ════════════════════════════════════════════════════
+      //  INIT & CLOUD SYNC
+      // ════════════════════════════════════════════════════
+
+      async function startTournamentDashboard() {
+        await loadCloudData();
+
+        updateStatStrip(); // <--- Add this line here!
+
         renderGroup(groupA, "group-a-body");
         renderGroup(groupB, "group-b-body");
         renderSeeds("a", 1, "seeds-a-b1-grid");
@@ -1526,15 +1550,16 @@
         runCalc();
       }
 
-      // Automatically updates your page immediately if a change happens in the Admin Tab
-      window.addEventListener("storage", () => {
-        seedResults =
-          JSON.parse(localStorage.getItem("macoffs_seed_results")) || [];
-        refreshUI();
-      });
+      // Listen for the walkie-talkie ping from the Admin Panel
+      syncChannel.onmessage = (event) => {
+        if (event.data === "update_data") {
+          console.log("New data detected! Refreshing dashboard...");
+          startTournamentDashboard();
+        }
+      };
 
-      // Run initial layout setup on page load
-      refreshUI();
+      // Boot up
+      startTournamentDashboard();
     </script>
   </body>
 </html>
