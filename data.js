@@ -2,7 +2,7 @@
 //  MacOffs Season 2 — Secure Cloud Engine
 // ════════════════════════════════════════════════════
 
-const currentBlock = 3;
+const currentBlock = 1;
 const syncChannel = new BroadcastChannel("macoffs_sync");
 
 // --- ROSTERS ---
