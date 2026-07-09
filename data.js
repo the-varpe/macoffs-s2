@@ -7,47 +7,47 @@ const syncChannel = new BroadcastChannel("macoffs_sync");
 
 // --- ROSTERS ---
 const groupA = [
-  { name: "imnotnyle", tier: "emerald", status: "qualified" },
-  { name: "ReaganMCSR", tier: "emerald", status: "alive" },
-  { name: "Marinos353", tier: "emerald", status: "alive" },
-  { name: "rouxzzcfop", tier: "emerald", status: "alive" },
+  
   { name: "Plyers8", tier: "diamond", status: "alive" },
+  { name: "K1lby", tier: "diamond", status: "alive" },
+  { name: "FlaxyB", tier: "diamond", status: "alive" },
+  { name: "aurazz_", tier: "diamond", status: "alive" },
+  { name: "Crazyfly072", tier: "diamond", status: "alive" },
+  { name: "johnplumber", tier: "emerald", status: "alive" },
+  { name: "qrynch", tier: "emerald", status: "alive" },
   { name: "blzako", tier: "emerald", status: "alive" },
   { name: "PoloTheElephant", tier: "emerald", status: "alive" },
-  { name: "BlueFalcon1423", tier: "emerald", status: "qualified" },
+  { name: "BlueFalcon1423", tier: "emerald", status: "alive" },
   { name: "FrenchFryJ ", tier: "emerald", status: "alive" },
   { name: "magga1a", tier: "emerald", status: "alive" },
   { name: "winterfairs", tier: "emerald", status: "alive" },
-  { name: "K1lby", tier: "diamond", status: "eliminated" },
-  { name: "qrynch", tier: "emerald", status: "alive" },
-  { name: "FlaxyB", tier: "diamond", status: "alive" },
-  { name: "johnplumber", tier: "emerald", status: "alive" },
-  { name: "aurazz_", tier: "diamond", status: "alive" },
-  { name: "Crazyfly072", tier: "diamond", status: "alive" },
+  { name: "imnotnyle", tier: "emerald", status: "alive" },
+  { name: "ReaganMCSR", tier: "emerald", status: "alive" },
+  { name: "Marinos353", tier: "emerald", status: "alive" },
+  { name: "rouxzzcfop", tier: "emerald", status: "alive" },
   { name: "XerxthePhyrst", tier: "emerald", status: "alive" },
-
-  // { name: "ZeRoIsNot0", tier: "iron", status: "alive" },
   // ... add the rest of Group A players
 ];
 
 const groupB = [
-  { name: "Aannini", tier: "coal", status: "alive" },
-  { name: "WarpedKun", tier: "coal", status: "alive" },
+  
   { name: "Beatricee", tier: "gold", status: "alive" },
-  { name: "theredpro", tier: "iron", status: "alive" },
-  { name: "dreadedguy", tier: "iron", status: "alive" },
-  { name: "FBiaLS", tier: "iron", status: "alive" },
-  { name: "Yeetone1", tier: "iron", status: "qualified" },
   { name: "OrangeLmao", tier: "gold", status: "alive" },
-  { name: "ZeRoIsNot0", tier: "iron", status: "alive" },
-  { name: "voidexed", tier: "iron", status: "alive" },
   { name: "badbreath", tier: "gold", status: "alive" },
-  { name: "ItzSteller", tier: "iron", status: "alive" },
   { name: "Samyli", tier: "gold", status: "alive" },
   { name: "CheesIt", tier: "gold", status: "alive" },
   { name: "AdditionalRAM", tier: "gold", status: "alive" },
   { name: "thingys_", tier: "gold", status: "alive" },
   { name: "searchcrafting", tier: "gold", status: "pending" },
+  { name: "ItzSteller", tier: "iron", status: "alive" },
+  { name: "ZeRoIsNot0", tier: "iron", status: "alive" },
+  { name: "voidexed", tier: "iron", status: "alive" },
+  { name: "theredpro", tier: "iron", status: "alive" },
+  { name: "dreadedguy", tier: "iron", status: "alive" },
+  { name: "FBiaLS", tier: "iron", status: "alive" },
+  { name: "Yeetone1", tier: "iron", status: "alive" },
+  { name: "Aannini", tier: "coal", status: "alive" },
+  { name: "WarpedKun", tier: "coal", status: "alive" },
   // ... add the rest of Group B players
 ];
 
