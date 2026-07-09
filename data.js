@@ -29,13 +29,14 @@ const groupA = [
 ];
 
 const groupB = [
-  { name: "Beatricee", tier: "gold", status: "alive" },
+  
   { name: "OrangeLmao", tier: "gold", status: "alive" },
   { name: "badbreath", tier: "gold", status: "alive" },
   { name: "Samyli", tier: "gold", status: "alive" },
   { name: "CheesIt", tier: "gold", status: "alive" },
   { name: "AdditionalRAM", tier: "gold", status: "alive" },
   { name: "thingys_", tier: "gold", status: "alive" },
+  { name: "Yeetone1", tier: "gold", status: "alive" },
   { name: "searchcrafting", tier: "gold", status: "pending" },
   { name: "ItzSteller", tier: "iron", status: "alive" },
   { name: "ZeRoIsNot0", tier: "iron", status: "alive" },
@@ -43,7 +44,7 @@ const groupB = [
   { name: "theredpro", tier: "iron", status: "alive" },
   { name: "dreadedguy", tier: "iron", status: "alive" },
   { name: "FBiaLS", tier: "iron", status: "alive" },
-  { name: "Yeetone1", tier: "iron", status: "alive" },
+  { name: "Beatricee", tier: "iron", status: "alive" },
   { name: "Aannini", tier: "coal", status: "alive" },
   { name: "WarpedKun", tier: "coal", status: "alive" },
   // ... add the rest of Group B players
