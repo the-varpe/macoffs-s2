@@ -2,12 +2,12 @@
 //  MacOffs Season 2 — Secure Cloud Engine
 // ════════════════════════════════════════════════════
 
-const currentBlock = 3;
+const currentBlock = 2;
 const syncChannel = new BroadcastChannel("macoffs_sync");
 
 // --- ROSTERS ---
 const groupA = [
-  { name: "imnotnyle", tier: "emerald", status: "alive" },
+  { name: "imnotnyle", tier: "emerald", status: "qualified" },
   { name: "ReaganMCSR", tier: "emerald", status: "alive" },
   { name: "Marinos353", tier: "emerald", status: "alive" },
   { name: "rouxzzcfop", tier: "emerald", status: "alive" },
@@ -37,7 +37,7 @@ const groupB = [
   { name: "theredpro", tier: "iron", status: "alive" },
   { name: "dreadedguy", tier: "iron", status: "alive" },
   { name: "FBiaLS", tier: "iron", status: "alive" },
-  { name: "Yeetone1", tier: "iron", status: "alive" },
+  { name: "Yeetone1", tier: "iron", status: "qualified" },
   { name: "OrangeLmao", tier: "gold", status: "alive" },
   { name: "ZeRoIsNot0", tier: "iron", status: "alive" },
   { name: "voidexed", tier: "iron", status: "alive" },
