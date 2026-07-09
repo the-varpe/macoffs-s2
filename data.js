@@ -14,7 +14,7 @@ const groupA = [
   { name: "Plyers8", tier: "diamond", status: "alive" },
   { name: "blzako", tier: "emerald", status: "alive" },
   { name: "PoloTheElephant", tier: "emerald", status: "alive" },
-  { name: "BlueFalcon1423", tier: "emerald", status: "alive" },
+  { name: "BlueFalcon1423", tier: "emerald", status: "qualified" },
   { name: "FrenchFryJ ", tier: "emerald", status: "alive" },
   { name: "magga1a", tier: "emerald", status: "alive" },
   { name: "winterfairs", tier: "emerald", status: "alive" },
