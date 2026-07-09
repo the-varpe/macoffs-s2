@@ -2,12 +2,11 @@
 //  MacOffs Season 2 — Secure Cloud Engine
 // ════════════════════════════════════════════════════
 
-const currentBlock = 1;
+let currentBlock = 1;
 const syncChannel = new BroadcastChannel("macoffs_sync");
 
 // --- ROSTERS ---
 const groupA = [
-  
   { name: "Plyers8", tier: "diamond", status: "alive" },
   { name: "K1lby", tier: "diamond", status: "alive" },
   { name: "FlaxyB", tier: "diamond", status: "alive" },
@@ -30,7 +29,6 @@ const groupA = [
 ];
 
 const groupB = [
-  
   { name: "Beatricee", tier: "gold", status: "alive" },
   { name: "OrangeLmao", tier: "gold", status: "alive" },
   { name: "badbreath", tier: "gold", status: "alive" },
@@ -62,6 +60,7 @@ async function loadCloudData() {
     if (data.record) {
       seedResults = data.record.seedResults || [];
       storedMatchIds = data.record.savedMatchIds || [];
+      currentBlock = data.record.currentBlock || 1;
     }
   } catch (err) {
     console.error("Cloud load error:", err);
@@ -72,7 +71,11 @@ async function saveCloudData() {
   const response = await fetch("/.netlify/functions/writeData", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ seedResults, savedMatchIds: storedMatchIds }),
+    body: JSON.stringify({
+      seedResults,
+      savedMatchIds: storedMatchIds,
+      currentBlock,
+    }),
   });
 
   if (!response.ok) {

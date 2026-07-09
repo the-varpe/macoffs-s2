@@ -504,6 +504,26 @@
         }, 0);
       }
 
+      function getBestTimeSeconds(player) {
+        let bestTime = Infinity;
+        const isFinals = currentGroup === "f";
+        const block = isFinals ? 3 : currentBlock;
+        const group = isFinals ? "f" : currentGroup;
+
+        const blockSeeds = seedResults.filter(
+          (s) => s.block === block && s.group === group && s.results,
+        );
+
+        blockSeeds.forEach((seed) => {
+          const result = seed.results.find((r) => r.name === player.name);
+          if (result && result.time !== "—") {
+            const timeInSeconds = parseTime(result.time);
+            if (timeInSeconds < bestTime) bestTime = timeInSeconds;
+          }
+        });
+        return bestTime;
+      }
+
       function setGroup(g) {
         currentGroup = g;
 
@@ -556,7 +576,7 @@
             : groupB;
 
         const grpLabel = isFinals
-          ? "Finals · Top 5 Group A + Top 5 Group B"
+          ? "Finals · Top 3 Group A + Top 3 Group B"
           : g === "a"
             ? "Group A · Netherite · Diamond · Emerald"
             : "Group B · Gold · Iron · Coal";
@@ -569,14 +589,18 @@
         const totalSeeds = isFinals ? 3 : 3;
 
         // ── LEADERBOARD ──
-        const active = isFinals
-          ? players
-          : players.filter((p) => p.status !== "eliminated");
-        const elim = isFinals
-          ? []
-          : players.filter((p) => p.status === "eliminated");
-        const sorted = [...active].sort((a, b) => blockPts(b) - blockPts(a));
-        const all = [...sorted, ...elim];
+        const all = [...players].sort((a, b) => {
+          // 1. Send eliminated players to the bottom
+          if (a.status === "eliminated" && b.status !== "eliminated") return 1;
+          if (b.status === "eliminated" && a.status !== "eliminated") return -1;
+
+          // 2. Sort by Points (Highest to Lowest)
+          const ptsDiff = blockPts(b) - blockPts(a);
+          if (ptsDiff !== 0) return ptsDiff;
+
+          // 3. TIEBREAKER: Sort by Best Single Seed Time (Lowest to Highest)
+          return getBestTimeSeconds(a) - getBestTimeSeconds(b);
+        });
 
         document.getElementById("lb-title").textContent = "Block Standings";
         document.getElementById("lb-sub").textContent = grpLabel;
@@ -615,7 +639,7 @@
           tbody.appendChild(tr);
         });
 
-        // ── LAST SEED ── (Updated Version)
+        // ── LAST SEED ──
         const completed = seedResults
           .filter(
             (s) => (isFinals ? s.group === "f" : s.group === g) && s.results,

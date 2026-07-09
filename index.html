@@ -879,8 +879,8 @@
           <h1>MacOffs <em>S2</em></h1>
         </div>
         <div class="header-right">
-          <span class="phase-badge"
-            ><span class="dot"></span>Block 1 — Group A</span
+          <span class="phase-badge" id="header-phase-badge"
+            ><span class="dot"></span>Block 1 — Live</span
           >
           <div class="header-stats">
             3 Seeds per Block · 20-Min Cap<br />
@@ -937,22 +937,19 @@
 
           <!-- BLOCK TIMELINE -->
           <div class="block-timeline">
-            <div class="block-step active-block">
-              <!-- change this to done-block when block 1 is complete --------------- -->
+            <div class="block-step" id="step-block-1">
               <div class="block-step-label">Block 1</div>
               <div class="block-step-title">Seeds 1–3</div>
               <div class="block-step-sub">Both Groups</div>
-              <!-- change this according to calculation --------------- -->
               <div class="block-step-elim">−60% of surplus</div>
             </div>
-            <div class="block-step">
-              <!-- change this to active-block and then done-block --------------- -->
+            <div class="block-step" id="step-block-2">
               <div class="block-step-label">Block 2</div>
               <div class="block-step-title">Seeds 4–6</div>
               <div class="block-step-sub">Both Groups</div>
               <div class="block-step-elim">Top 3 → Finals</div>
             </div>
-            <div class="block-step">
+            <div class="block-step" id="step-block-3">
               <div class="block-step-label">Finals</div>
               <div class="block-step-title">Seeds 7–9</div>
               <div class="block-step-sub">Merged · Top 6</div>
@@ -970,8 +967,7 @@
                   <div class="group-title">Group A</div>
                   <div class="group-tiers">Netherite · Diamond · Emerald</div>
                 </div>
-                <span class="status-tag s-alive">Block 1</span>
-                <!-- edit the line above -->
+                <span class="status-tag" id="group-a-status-tag">Block 1</span>
               </div>
               <table class="player-table">
                 <thead>
@@ -993,8 +989,7 @@
                   <div class="group-title">Group B</div>
                   <div class="group-tiers">Gold · Iron · Coal</div>
                 </div>
-                <span class="status-tag s-pending">Waiting</span>
-                <!-- edit the line above -->
+                <span class="status-tag" id="group-b-status-tag">Waiting</span>
               </div>
               <table class="player-table">
                 <thead>
@@ -1280,11 +1275,35 @@
         }, 0);
       }
 
+      // Helper function to find a player's fastest time in the current block
+      function getBestTimeSeconds(player) {
+        let bestTime = Infinity;
+        const blockSeeds = seedResults.filter(
+          (s) => s.block === currentBlock && s.results,
+        );
+
+        blockSeeds.forEach((seed) => {
+          const result = seed.results.find((r) => r.name === player.name);
+          if (result && result.time !== "—") {
+            const timeInSeconds = parseTime(result.time);
+            if (timeInSeconds < bestTime) bestTime = timeInSeconds;
+          }
+        });
+        return bestTime;
+      }
+
       function renderGroup(players, tbodyId) {
         const sorted = [...players].sort((a, b) => {
+          // 1. Send eliminated players to the bottom
           if (a.status === "eliminated" && b.status !== "eliminated") return 1;
           if (b.status === "eliminated" && a.status !== "eliminated") return -1;
-          return totalPts(b) - totalPts(a);
+
+          // 2. Sort by Points (Highest to Lowest)
+          const ptsDiff = totalPts(b) - totalPts(a);
+          if (ptsDiff !== 0) return ptsDiff;
+
+          // 3. TIEBREAKER: Sort by Best Single Seed Time (Lowest to Highest)
+          return getBestTimeSeconds(a) - getBestTimeSeconds(b);
         });
 
         const tbody = document.getElementById(tbodyId);
@@ -1467,9 +1486,9 @@
   `;
 
         document.getElementById("elim-formula-note").innerHTML =
-          `Formula: surplus = N − 5 &nbsp;·&nbsp; Block 1 = 60% of surplus &nbsp;·&nbsp; Block 2 = remainder<br>
-     Group A: ${nA} players → surplus ${Math.max(nA - 5, 0)} → cuts ${a.cut1} / ${a.cut2}<br>
-     Group B: ${nB} players → surplus ${Math.max(nB - 5, 0)} → cuts ${b.cut1} / ${b.cut2}`;
+          `Formula: surplus = N − 3 &nbsp;·&nbsp; Block 1 = 60% of surplus &nbsp;·&nbsp; Block 2 = remainder<br>
+     Group A: ${nA} players → surplus ${Math.max(nA - 3, 0)} → cuts ${a.cut1} / ${a.cut2}<br>
+     Group B: ${nB} players → surplus ${Math.max(nB - 3, 0)} → cuts ${b.cut1} / ${b.cut2}`;
       }
 
       function renderFinals() {
@@ -1530,6 +1549,53 @@
         document.getElementById("stat-block").textContent = currentBlock;
         document.getElementById("stat-seeds").textContent = seedResults.length;
         document.getElementById("stat-elim").textContent = elimCount;
+
+        // Dynamically update the Group Panel tags
+        const tagA = document.getElementById("group-a-status-tag");
+        const tagB = document.getElementById("group-b-status-tag");
+
+        if (currentBlock === 3) {
+          tagA.className = "status-tag s-qualified";
+          tagA.textContent = "MERGED";
+          tagB.className = "status-tag s-qualified";
+          tagB.textContent = "MERGED";
+        } else {
+          tagA.className = "status-tag s-alive";
+          tagA.textContent = `Block ${currentBlock}`;
+          tagB.className = "status-tag s-alive";
+          tagB.textContent = `Block ${currentBlock}`;
+        }
+      }
+
+      function updateBlockTimeline() {
+        const b1 = document.getElementById("step-block-1");
+        const b2 = document.getElementById("step-block-2");
+        const b3 = document.getElementById("step-block-3");
+
+        // Reset all classes to default
+        b1.className = "block-step";
+        b2.className = "block-step";
+        b3.className = "block-step";
+
+        // Apply active and done styling dynamically
+        if (currentBlock === 1) {
+          b1.classList.add("active-block");
+        } else if (currentBlock === 2) {
+          b1.classList.add("done-block");
+          b2.classList.add("active-block");
+        } else if (currentBlock >= 3) {
+          b1.classList.add("done-block");
+          b2.classList.add("done-block");
+          b3.classList.add("active-block");
+        }
+
+        // Update the top-right header badge
+        const headerBadge = document.getElementById("header-phase-badge");
+        if (currentBlock === 3) {
+          headerBadge.innerHTML = '<span class="dot"></span>Finals — Live';
+        } else {
+          headerBadge.innerHTML = `<span class="dot"></span>Block ${currentBlock} — Live`;
+        }
       }
       // ════════════════════════════════════════════════════
       //  INIT & CLOUD SYNC
@@ -1539,6 +1605,7 @@
         await loadCloudData();
 
         updateStatStrip(); // <--- Add this line here!
+        updateBlockTimeline();
 
         renderGroup(groupA, "group-a-body");
         renderGroup(groupB, "group-b-body");

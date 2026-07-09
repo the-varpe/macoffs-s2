@@ -67,8 +67,37 @@
         color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 2px;
-        margin-bottom: 30px;
+        margin-bottom: 24px;
       }
+      .control-box {
+        background: #090b10;
+        border: 1px solid var(--border);
+        padding: 16px;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      .phase-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+      }
+      .phase-val {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--diamond);
+        margin-bottom: 16px;
+      }
+      .phase-val.f {
+        color: var(--emerald);
+      }
+      .btn-row {
+        display: flex;
+        gap: 12px;
+      }
+
       .btn {
         display: block;
         width: 100%;
@@ -81,13 +110,25 @@
         border: 1px solid transparent;
         cursor: pointer;
         transition: all 0.2s;
-        margin-bottom: 16px;
         text-align: center;
+        background: none;
+      }
+      .btn-half {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+      .btn-half:hover {
+        border-color: var(--text);
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
       }
       .btn-lock {
         border-color: var(--diamond);
         color: var(--diamond);
         background: rgba(56, 212, 248, 0.06);
+        margin-bottom: 24px;
       }
       .btn-lock:hover {
         background: rgba(56, 212, 248, 0.15);
@@ -97,7 +138,6 @@
         color: var(--eliminated);
         background: rgba(255, 58, 58, 0.06);
         margin-top: 40px;
-        margin-bottom: 0;
       }
       .btn-clear:hover {
         background: rgba(255, 58, 58, 0.15);
@@ -129,19 +169,31 @@
       <h1>Tournament Console</h1>
       <div class="subtitle">MacOffs S2 Control Panel</div>
 
+      <div class="control-box">
+        <div class="phase-label">Active Phase</div>
+        <div class="phase-val" id="admin-phase-display">Loading Data...</div>
+        <div class="btn-row">
+          <button onclick="shiftBlock(-1)" class="btn btn-half">
+            &lt; Regress
+          </button>
+          <button onclick="shiftBlock(1)" class="btn btn-half">
+            Advance &gt;
+          </button>
+        </div>
+      </div>
+
       <button onclick="triggerLock()" class="btn btn-lock">
-        🔒 Retrieve & Lock Latest Match
+        🔒 Retrieve & Lock Match
       </button>
 
       <div
         style="
-          margin-top: 24px;
-          margin-bottom: 8px;
           font-family: &quot;JetBrains Mono&quot;, monospace;
           font-size: 10px;
           color: var(--muted);
           text-transform: uppercase;
           letter-spacing: 1px;
+          margin-bottom: 8px;
         "
       >
         Console Output:
@@ -151,7 +203,7 @@
       </div>
 
       <button onclick="triggerReset()" class="btn btn-clear">
-        ⚠️ Clear All Tournament Data
+        ⚠️ Clear Database
       </button>
     </div>
 
@@ -159,6 +211,7 @@
     <script>
       const logEl = document.getElementById("admin-log");
 
+      // --- Console Logging ---
       function log(message, type = "") {
         const entry = document.createElement("div");
         entry.className = `log-entry ${type ? "log-" + type : ""}`;
@@ -167,7 +220,6 @@
         logEl.scrollTop = logEl.scrollHeight;
       }
 
-      // Capture standard alert strings to route them straight into our console box
       window.alert = (msg) => {
         if (msg.includes("Success")) log(msg, "success");
         else if (
@@ -179,6 +231,50 @@
         else log(msg);
       };
 
+      // --- Boot Up sequence for Admin ---
+      async function initAdmin() {
+        await loadCloudData();
+        updatePhaseDisplay();
+        log("Connected to Cloud Database.", "success");
+      }
+
+      function updatePhaseDisplay() {
+        const display = document.getElementById("admin-phase-display");
+        if (currentBlock === 3) {
+          display.textContent = "Finals (Merged)";
+          display.className = "phase-val f";
+        } else {
+          display.textContent = `Block ${currentBlock}`;
+          display.className = "phase-val";
+        }
+      }
+
+      // --- Admin Actions ---
+      async function shiftBlock(direction) {
+        let newBlock = currentBlock + direction;
+
+        // Prevent going out of bounds
+        if (newBlock < 1) newBlock = 1;
+        if (newBlock > 3) newBlock = 3;
+        if (newBlock === currentBlock) return;
+
+        // Apply change and push to database
+        currentBlock = newBlock;
+        updatePhaseDisplay();
+
+        try {
+          await saveCloudData();
+          log(
+            `Advanced tournament phase to: ${currentBlock === 3 ? "Finals" : "Block " + currentBlock}`,
+            "success",
+          );
+        } catch (error) {
+          // THIS WILL NOW PRINT THE EXACT ERROR REASON
+          console.error(error);
+          log(`Failed: ${error.message}`, "error");
+        }
+      }
+
       async function triggerLock() {
         log("Querying API for the host's most recent match...");
         await lockLatestMatch();
@@ -186,7 +282,12 @@
 
       function triggerReset() {
         resetTournamentBoard();
+        // Reset local block visually if cleared
+        setTimeout(() => updatePhaseDisplay(), 1000);
       }
+
+      // Boot up the admin page
+      initAdmin();
     </script>
   </body>
 </html>
