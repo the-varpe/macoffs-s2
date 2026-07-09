@@ -46,6 +46,8 @@ const groupB = [
   { name: "Samyli", tier: "gold", status: "alive" },
   { name: "CheesIt", tier: "gold", status: "alive" },
   { name: "AdditionalRAM", tier: "gold", status: "alive" },
+  { name: "thingys_", tier: "gold", status: "alive" },
+  { name: "searchcrafting", tier: "gold", status: "pendning" },
   // ... add the rest of Group B players
 ];
 
