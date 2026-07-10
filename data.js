@@ -46,6 +46,7 @@ const groupB = [
   { name: "FBiaLS", tier: "iron", status: "alive" },
   { name: "Beatricee", tier: "iron", status: "alive" },
   { name: "zaaning", tier: "iron", status: "alive" },
+  { name: "ducky8x", tier: "iron", status: "alive" },
   { name: "Aannini", tier: "coal", status: "alive" },
   { name: "WarpedKun", tier: "coal", status: "alive" },
   // ... add the rest of Group B players
