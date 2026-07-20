@@ -58,8 +58,12 @@ let storedMatchIds = [];
 // --- CACHE INVALIDATION LISTENER ---
 syncChannel.addEventListener("message", (event) => {
   if (event.data === "update_data") {
+    // 1. Wipe the old local memory
     sessionStorage.removeItem("macoffs_cache");
     sessionStorage.removeItem("macoffs_cache_time");
+
+    // 2. Force the browser to instantly reload the screen with fresh data!
+    window.location.reload();
   }
 });
 
@@ -110,7 +114,12 @@ async function loadCloudData() {
 }
 
 async function saveCloudData() {
-  const payload = { seedResults, savedMatchIds: storedMatchIds, currentBlock };
+  // Force currentBlock to be an integer so JSONBin formats it properly
+  const payload = {
+    seedResults,
+    savedMatchIds: storedMatchIds,
+    currentBlock: parseInt(currentBlock, 10),
+  };
 
   const response = await fetch("/api/writeData", {
     method: "POST",
@@ -124,6 +133,8 @@ async function saveCloudData() {
 
   sessionStorage.setItem("macoffs_cache", JSON.stringify(payload));
   sessionStorage.setItem("macoffs_cache_time", Date.now().toString());
+
+  // Send the ping that triggers the auto-refresh we added in Step 1
   syncChannel.postMessage("update_data");
 }
 
