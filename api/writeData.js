@@ -1,49 +1,41 @@
 module.exports = async (req, res) => {
+  if (req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
+  }
+
+  const binId = process.env.JSONBIN_ID;
+  const binKey = process.env.JSONBIN_KEY;
+
+  if (!binId || !binKey) {
+    return res.status(500).json({
+      error: "Missing Environment Variables. Check Vercel settings.",
+    });
+  }
+
   try {
-    const hostName = process.env.MCSR_HOST;
-    const privateKey = process.env.MCSR_PRIVATE_KEY;
+    const requestBody =
+      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-    if (!hostName) {
-      return res
-        .status(500)
-        .json({ error: "Missing MCSR_HOST environment variable." });
-    }
-
-    // 1. Fetch the recent matches list
-    const listResponse = await fetch(
-      `https://api.mcsrranked.com/users/${hostName}/matches?type=3&count=1`,
-    );
-    const listJson = await listResponse.json();
-
-    if (
-      listJson.status !== "success" ||
-      !listJson.data ||
-      listJson.data.length === 0
-    ) {
-      return res
-        .status(404)
-        .json({ error: "No private room matches found for this host." });
-    }
-
-    const matchId = listJson.data[0].id;
-
-    // 2. Fetch the advanced completion data securely
-    const detailResponse = await fetch(
-      `https://api.mcsrranked.com/matches/${matchId}`,
-      {
-        headers: { "Private-Key": privateKey },
+    const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": binKey,
       },
-    );
-    const detailJson = await detailResponse.json();
+      body: JSON.stringify(requestBody),
+    });
 
-    if (detailJson.status !== "success") {
-      return res
-        .status(500)
-        .json({ error: "Could not load advanced run parameters." });
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({
+        error: "JSONBin rejected the request",
+        details: errorText,
+      });
     }
 
-    return res.status(200).json({ data: detailJson.data });
+    const data = await response.json();
+    return res.status(200).json(data);
   } catch (error) {
-    return res.status(500).json({ error: "Backend failed." });
+    return res.status(500).json({ error: error.message });
   }
 };
