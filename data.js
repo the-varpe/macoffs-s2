@@ -29,7 +29,6 @@ const groupA = [
 ];
 
 const groupB = [
-  
   { name: "OrangeLmao", tier: "gold", status: "alive" },
   { name: "badbreath", tier: "gold", status: "alive" },
   { name: "Samyli", tier: "gold", status: "alive" },
@@ -56,15 +55,54 @@ const groupB = [
 let seedResults = [];
 let storedMatchIds = [];
 
+// --- CACHE INVALIDATION LISTENER ---
+syncChannel.addEventListener("message", (event) => {
+  if (event.data === "update_data") {
+    sessionStorage.removeItem("macoffs_cache");
+    sessionStorage.removeItem("macoffs_cache_time");
+  }
+});
+
 // --- SECURE CLOUD NETWORK FUNCTIONS ---
 async function loadCloudData() {
+  const cacheKey = "macoffs_cache";
+  const cacheTimeKey = "macoffs_cache_time";
+  const CACHE_TTL = 60000; // 60 seconds
+
   try {
-    const response = await fetch("/.netlify/functions/readData");
+    const cachedData = sessionStorage.getItem(cacheKey);
+    const cacheTimestamp = sessionStorage.getItem(cacheTimeKey);
+
+    if (
+      cachedData &&
+      cacheTimestamp &&
+      Date.now() - parseInt(cacheTimestamp) < CACHE_TTL
+    ) {
+      const parsed = JSON.parse(cachedData);
+      seedResults = parsed.seedResults || [];
+      storedMatchIds = parsed.savedMatchIds || [];
+      currentBlock = parsed.currentBlock || 1;
+      console.log("Loaded data from local browser cache.");
+      return;
+    }
+
+    const response = await fetch("/api/readData");
     const data = await response.json();
+
     if (data.record) {
       seedResults = data.record.seedResults || [];
       storedMatchIds = data.record.savedMatchIds || [];
       currentBlock = data.record.currentBlock || 1;
+
+      sessionStorage.setItem(
+        cacheKey,
+        JSON.stringify({
+          seedResults,
+          savedMatchIds: storedMatchIds,
+          currentBlock,
+        }),
+      );
+      sessionStorage.setItem(cacheTimeKey, Date.now().toString());
     }
   } catch (err) {
     console.error("Cloud load error:", err);
@@ -72,44 +110,29 @@ async function loadCloudData() {
 }
 
 async function saveCloudData() {
-  const response = await fetch("/.netlify/functions/writeData", {
+  const payload = { seedResults, savedMatchIds: storedMatchIds, currentBlock };
+
+  const response = await fetch("/api/writeData", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      seedResults,
-      savedMatchIds: storedMatchIds,
-      currentBlock,
-    }),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
     throw new Error(`Database write failed with status ${response.status}`);
   }
 
-  // Tell other tabs to refresh
+  sessionStorage.setItem("macoffs_cache", JSON.stringify(payload));
+  sessionStorage.setItem("macoffs_cache_time", Date.now().toString());
   syncChannel.postMessage("update_data");
 }
 
-// --- LOGIC HELPER FUNCTIONS ---
-function formatMsToTime(ms) {
-  if (!ms || ms >= 1200000) return "—";
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-}
-
-function calculatePoints(position) {
-  const pointsMap = { 1: 12, 2: 9, 3: 7, 4: 5, 5: 4, 6: 3, 7: 2, 8: 1, 9: 1 };
-  return pointsMap[position] || 0;
-}
-
-// --- ADMIN CONTROL FUNCTIONS ---
 async function lockLatestMatch() {
   try {
     await loadCloudData();
 
-    const matchResponse = await fetch("/.netlify/functions/getLatestMatch");
+    // Vercel Endpoint
+    const matchResponse = await fetch("/api/getLatestMatch");
     const matchData = await matchResponse.json();
 
     if (matchData.error) {
@@ -126,31 +149,12 @@ async function lockLatestMatch() {
       return;
     }
 
-    const matchPlayerNames = advancedMatch.players.map((p) =>
-      p.nickname.toLowerCase(),
-    );
-    const hasGroupA = groupA.some((p) =>
-      matchPlayerNames.includes(p.name.toLowerCase()),
-    );
-    const hasGroupB = groupB.some((p) =>
-      matchPlayerNames.includes(p.name.toLowerCase()),
-    );
-
-    let determinedGroup = "pending";
+    let determinedGroup = currentGroup;
     let blockNum = currentBlock;
 
-    if (hasGroupA && hasGroupB) {
+    if (currentBlock === 3) {
       determinedGroup = "f";
       blockNum = 3;
-    } else if (hasGroupA) {
-      determinedGroup = "a";
-    } else if (hasGroupB) {
-      determinedGroup = "b";
-    } else {
-      alert(
-        "This match was ignored. None of the players belong to Group A or Group B.",
-      );
-      return;
     }
 
     const existingGroupSeeds = seedResults.filter(
@@ -188,13 +192,25 @@ async function lockLatestMatch() {
     storedMatchIds.push(advancedMatch.id);
 
     await saveCloudData();
-    alert(
-      `Success! Captured Match #${advancedMatch.id} as Seed ${seedNum} for Group ${determinedGroup.toUpperCase()}.`,
-    );
+    alert(`Success! Captured Match #${advancedMatch.id} as Seed ${seedNum}.`);
   } catch (error) {
     console.error("Lock sequence crash:", error);
     alert(`Failed to track match: ${error.message}`);
   }
+}
+
+// --- LOGIC HELPER FUNCTIONS ---
+function formatMsToTime(ms) {
+  if (!ms || ms >= 1200000) return "—";
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
+function calculatePoints(position) {
+  const pointsMap = { 1: 12, 2: 9, 3: 7, 4: 5, 5: 4, 6: 3, 7: 2, 8: 1, 9: 1 };
+  return pointsMap[position] || 0;
 }
 
 async function resetTournamentBoard() {
