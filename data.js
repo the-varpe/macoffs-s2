@@ -149,12 +149,37 @@ async function lockLatestMatch() {
       return;
     }
 
-    let determinedGroup = currentGroup;
+    let determinedGroup = null;
     let blockNum = currentBlock;
 
     if (currentBlock === 3) {
       determinedGroup = "f";
-      blockNum = 3;
+    } else {
+      // 1. Get a list of lowercase nicknames from the private room match
+      const matchPlayerNames = advancedMatch.players.map((p) =>
+        p.nickname.toLowerCase(),
+      );
+
+      // 2. Cross-reference them with your tournament roster arrays
+      const hasGroupAPlayer = groupA.some((p) =>
+        matchPlayerNames.includes(p.name.toLowerCase()),
+      );
+      const hasGroupBPlayer = groupB.some((p) =>
+        matchPlayerNames.includes(p.name.toLowerCase()),
+      );
+
+      // 3. Assign the group automatically based on who is inside
+      if (hasGroupAPlayer) {
+        determinedGroup = "a";
+      } else if (hasGroupBPlayer) {
+        determinedGroup = "b";
+      } else {
+        // Safe exit if it's an unrelated private room
+        alert(
+          "Failed to track match: None of the players in this private room match your Group A or Group B roster. Verify the host is in the correct room!",
+        );
+        return;
+      }
     }
 
     const existingGroupSeeds = seedResults.filter(
