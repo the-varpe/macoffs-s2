@@ -43,7 +43,6 @@ const groupB = [
   { name: "voidexed", tier: "iron", status: "alive" },
   { name: "dreadedguy", tier: "iron", status: "alive" },
   { name: "FBiaLS", tier: "iron", status: "alive" },
-  { name: "Beatricee", tier: "iron", status: "alive" },
   { name: "zaaning", tier: "iron", status: "alive" },
   { name: "ducky8x", tier: "iron", status: "alive" },
   { name: "Envilatous", tier: "iron", status: "alive" },
