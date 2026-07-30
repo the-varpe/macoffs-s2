@@ -10,7 +10,6 @@ const groupA = [
   { name: "Plyers8", tier: "diamond", status: "alive" },
   { name: "K1lby", tier: "diamond", status: "alive" },
   { name: "FlaxyB", tier: "diamond", status: "alive" },
-  { name: "Crazyfly072", tier: "diamond", status: "alive" },
   { name: "qrynch", tier: "emerald", status: "alive" },
   { name: "blzako", tier: "emerald", status: "alive" },
   { name: "PoloTheElephant", tier: "emerald", status: "alive" },
@@ -28,7 +27,6 @@ const groupA = [
 const groupB = [
   { name: "OrangeLmao", tier: "gold", status: "alive" },
   { name: "badbreath", tier: "gold", status: "alive" },
-  { name: "Samyli", tier: "gold", status: "alive" },
   { name: "CheesIt", tier: "gold", status: "alive" },
   { name: "AdditionalRAM", tier: "gold", status: "alive" },
   { name: "thingys_", tier: "gold", status: "alive" },
