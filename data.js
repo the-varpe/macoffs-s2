@@ -10,9 +10,7 @@ const groupA = [
   { name: "Plyers8", tier: "diamond", status: "alive" },
   { name: "K1lby", tier: "diamond", status: "alive" },
   { name: "FlaxyB", tier: "diamond", status: "alive" },
-  { name: "aurazz_", tier: "diamond", status: "alive" },
   { name: "Crazyfly072", tier: "diamond", status: "alive" },
-  { name: "johnplumber", tier: "emerald", status: "alive" },
   { name: "qrynch", tier: "emerald", status: "alive" },
   { name: "blzako", tier: "emerald", status: "alive" },
   { name: "PoloTheElephant", tier: "emerald", status: "alive" },
@@ -22,7 +20,6 @@ const groupA = [
   { name: "imnotnyle", tier: "emerald", status: "alive" },
   { name: "ReaganMCSR", tier: "emerald", status: "alive" },
   { name: "Marinos353", tier: "emerald", status: "alive" },
-  { name: "rouxzzcfop", tier: "emerald", status: "alive" },
   { name: "XerxthePhyrst", tier: "emerald", status: "alive" },
   { name: "Andysh1sells", tier: "emerald", status: "alive" },
   // ... add the rest of Group A players
