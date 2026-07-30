@@ -33,7 +33,6 @@ const groupB = [
   { name: "AdditionalRAM", tier: "gold", status: "alive" },
   { name: "thingys_", tier: "gold", status: "alive" },
   { name: "Yeetone1", tier: "gold", status: "alive" },
-  { name: "searchcrafting", tier: "gold", status: "pending" },
   { name: "ItzSteller", tier: "iron", status: "alive" },
   { name: "ZeRoIsNot0", tier: "iron", status: "alive" },
   { name: "voidexed", tier: "iron", status: "alive" },
