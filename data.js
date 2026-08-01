@@ -33,6 +33,7 @@ const groupB = [
   { name: "ZeRoIsNot0", tier: "gold", status: "alive" },
   { name: "voidexed", tier: "gold", status: "alive" },
   { name: "dreadedguy", tier: "gold", status: "alive" },
+  { name: "crxpr", tier: "gold", status: "alive" },
   { name: "badbreath", tier: "iron", status: "alive" },
   { name: "Chees_It", tier: "iron", status: "alive" },
   { name: "zaaning", tier: "iron", status: "alive" },
