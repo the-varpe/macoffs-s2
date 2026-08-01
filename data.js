@@ -8,7 +8,7 @@ const syncChannel = new BroadcastChannel("macoffs_sync");
 // --- ROSTERS ---
 const groupA = [
   { name: "Plyers8", tier: "diamond", status: "alive" },
-  { name: "K1lby", tier: "diamond", status: "alive" },
+  { name: "k1lby", tier: "diamond", status: "alive" },
   { name: "FlaxyB", tier: "diamond", status: "alive" },
   { name: "qrynch", tier: "diamond", status: "alive" },
   { name: "winterfairs", tier: "diamond", status: "alive" },
