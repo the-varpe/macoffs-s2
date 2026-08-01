@@ -20,7 +20,7 @@ const groupA = [
   { name: "ReaganMCSR", tier: "emerald", status: "alive" },
   { name: "Marinos353", tier: "emerald", status: "alive" },
   { name: "XerxthePhyrst", tier: "emerald", status: "alive" },
-  { name: "Andysh1sells", tier: "emerald", status: "alive" },
+  { name: "andysh1sells", tier: "emerald", status: "alive" },
   { name: "thingys_", tier: "emerald", status: "alive" },
   // ... add the rest of Group A players
 ];
