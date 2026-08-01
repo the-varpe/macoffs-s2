@@ -39,7 +39,7 @@ const groupB = [
   { name: "zaaning", tier: "iron", status: "eliminated" },
   { name: "ducky8x", tier: "iron", status: "alive" },
   { name: "Envilatous", tier: "iron", status: "alive" },
-  { name: "Aannini", tier: "coal", status: "alive" },
+  { name: "Aannini", tier: "coal", status: "eliminated" },
   // ... add the rest of Group B players
 ];
 
