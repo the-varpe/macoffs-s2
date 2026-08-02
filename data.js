@@ -26,20 +26,20 @@ const groupA = [
 ];
 
 const groupB = [
-  { name: "OrangeLmao", tier: "gold", status: "alive" },
-  { name: "AdditionalRAM", tier: "gold", status: "alive" },
+  { name: "OrangeLmao", tier: "gold", status: "eliminated" },
+  { name: "AdditionalRAM", tier: "gold", status: "eliminated" },
   { name: "Yeetone1", tier: "gold", status: "alive" },
-  { name: "ItzSteller", tier: "gold", status: "alive" },
-  { name: "ZeRoIsNot0", tier: "gold", status: "alive" },
-  { name: "voidexed", tier: "gold", status: "alive" },
-  { name: "dreadedguy", tier: "gold", status: "alive" },
-  { name: "crxpr", tier: "gold", status: "alive" },
+  { name: "ItzSteller", tier: "gold", status: "eliminated" },
+  { name: "ZeRoIsNot0", tier: "gold", status: "eliminated" },
+  { name: "voidexed", tier: "gold", status: "eliminated" },
+  { name: "dreadedguy", tier: "gold", status: "eliminated" },
+  { name: "crxpr", tier: "gold", status: "eliminated" },
   { name: "badbreath", tier: "iron", status: "alive" },
   { name: "Chees_It", tier: "iron", status: "alive" },
-  { name: "zaaning", tier: "iron", status: "alive" },
+  { name: "zaaning", tier: "iron", status: "eliminated" },
   { name: "ducky8x", tier: "iron", status: "alive" },
-  { name: "Envilatous", tier: "iron", status: "alive" },
-  { name: "Aannini", tier: "coal", status: "alive" },
+  { name: "Envilatous", tier: "iron", status: "eliminated" },
+  { name: "Aannini", tier: "coal", status: "eliminated" },
   // ... add the rest of Group B players
 ];
 
