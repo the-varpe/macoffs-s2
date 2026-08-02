@@ -30,7 +30,7 @@ const groupB = [
   { name: "AdditionalRAM", tier: "gold", status: "eliminated" },
   { name: "Yeetone1", tier: "gold", status: "alive" },
   { name: "ItzSteller", tier: "gold", status: "eliminated" },
-  { name: "ZeRoIsNot0", tier: "gold", status: "eliminated" },
+  { name: "ZeRoIsNot0", tier: "gold", status: "alive" },
   { name: "voidexed", tier: "gold", status: "eliminated" },
   { name: "dreadedguy", tier: "gold", status: "eliminated" },
   { name: "crxpr", tier: "gold", status: "eliminated" },
